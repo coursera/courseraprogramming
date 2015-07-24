@@ -1,6 +1,9 @@
 courseraprogramming
 ===================
 
+.. image:: https://travis-ci.org/coursera/courseraprogramming.svg
+    :target: https://travis-ci.org/coursera/courseraprogramming
+
 The grid sdk is a software development toolkit that helps to develop
 asynchronous graders for Coursera (typically programming assignments).
 
