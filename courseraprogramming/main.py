@@ -64,6 +64,9 @@ def build_parser():
     # create the parser for the cat command
     commands.cat.parser(subparsers)
 
+    # create the parser for the inspect command
+    commands.inspect.parser(subparsers)
+
     # create the parser for the run command?
 
     # create the parser for the build command?
