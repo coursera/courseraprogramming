@@ -1,0 +1,18 @@
+# Git ignore file.
+
+# Ignore the standard virtual environment folder.
+venv
+ # Ignore autoenv environments.
+.env
+# Ignore the tox environment
+.tox
+
+# Never commit compiled python files.
+*.pyc
+*.pyo
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
