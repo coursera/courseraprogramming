@@ -33,8 +33,11 @@ def command_inspect(args):
         '-it',
         '--entrypoint',
         args.shell,
-        args.containerId,
     ]
+    if 'submission' in args and args.submission is not None:
+        command_line.append('-v')
+        command_line.append(common.mk_submission_volume_str(args.submission))
+    command_line.append(args.containerId)
     logging.debug("About to execute command: %s", ' '.join(command_line))
     os.execvp('docker', command_line)
 
@@ -53,4 +56,9 @@ def parser(subparsers):
         '--shell',
         help='Shell to use.',
         default='/bin/bash')
+    parser_inspect.add_argument(
+        '-d',
+        '--submission',
+        help='Submission directory to mount into the container.',
+        type=common.arg_fq_dir)
     return parser_inspect

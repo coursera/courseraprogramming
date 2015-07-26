@@ -56,7 +56,7 @@ def parser(subparsers):
     # create the parser for the cat command
     parser_cat = subparsers.add_parser(
         'cat',
-        help='Output files within the container to the console',
+        help='Output files within the container to the console for debugging',
         parents=[common.container_parser()])
     parser_cat.set_defaults(func=command_cat)
     parser_cat.add_argument('file', help='File(s) to output.', nargs='+')

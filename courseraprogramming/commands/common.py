@@ -21,6 +21,7 @@ You may install it from source, or via pip.
 """
 
 import argparse
+import os
 
 
 def container_parser():
@@ -34,3 +35,23 @@ def container_parser():
         help='The container id to operate on.')
 
     return parser
+
+
+def arg_fq_dir(dirname):
+    """
+    Verifies an argument refers to a directory on the file system, and converts
+    it to a fully-qualified path.
+    """
+    if not os.path.isdir(dirname):
+        msg = "%s is not a directory" % dirname
+        # TODO: add some sanity checks if on boot2docker system to ensure that
+        # the fully qualified path is somewhere within the /Users/$USER
+        # directory (or equivalent on windows).
+        raise argparse.ArgumentTypeError(msg)
+    else:
+        return os.path.abspath(os.path.expanduser(dirname))
+
+
+def mk_submission_volume_str(fq_local_dir_name):
+    "Converts a local fully-qualified path to a docker volume string"
+    return '%s:/shared/submission' % fq_local_dir_name
