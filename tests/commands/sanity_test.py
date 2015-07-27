@@ -55,6 +55,17 @@ def test_command_sanity():
             "ENTRYPOINT /bin/bash"], (
             ('root', 'WARNING', 'Line 2: Please mark your grading script or '
                 'binary as the ENTRYPOINT, and not bash'),)),
+        ("expose_command", [
+            "FROM debian\n",
+            "\n",
+            "ENTRYPOINT /grader.sh\n",
+            "EXPOSE 80"], (
+            ('root', 'WARNING', 'Line 3: EXPOSE commands do not work for '
+                'graders'),)),
+        ("good_script", [
+            "FROM debian\n",
+            "\n",
+            "ENTRYPOINT /grader.sh\n"], ()),
     ]
     for testcase in testCases:
         testFn = command_sanity_impl

@@ -82,6 +82,12 @@ def command_sanity(args):
                             'or binary as the ENTRYPOINT, and not bash', {
                                 'lineno': cmd['startline'],
                             })
+                if cmd['instruction'].lower() == 'expose':
+                    logging.warn(
+                        'Line %(lineno)s: EXPOSE commands do not work for '
+                        'graders', {
+                            'lineno': cmd['startline'],
+                        })
             if not seen_entrypoint:
                 logging.warn('Your Dockerfile must define an ENTRYPOINT.')
     else:
