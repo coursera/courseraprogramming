@@ -30,14 +30,15 @@ def build_parser():
     "Build an argparse argument parser to parse the command line."
 
     parser = argparse.ArgumentParser(
-        description="Coursera asynchronous grader command-line tool. This tool \
-        helps instructional teams as they develop sophisticated assignments. \
-        There are a number of subcommands, each with their own help \
-        documentation. Feel free to view them by executing `%(prog)s \
-        SUB_COMMAND -h`. For example: `%(prog)s ls -h`.",
-        epilog="Please report any bugs to 'app-platform@coursera.org'. If you \
-        would like to contribute to this tool's development, check us out at: \
-        https://github.com/coursera/gridSdk",
+        description="""Coursera asynchronous grader command-line tool. This tool
+        helps instructional teams as they develop sophisticated assignments.
+        There are a number of subcommands, each with their own help
+        documentation. Feel free to view them by executing `%(prog)s
+        SUB_COMMAND -h`. For example: `%(prog)s ls -h`.""",
+        epilog="""Please file bugs on github at:
+        https://github.com/coursera/courseraprogramming/issues. If you
+        would like to contribute to this tool's development, check us out at:
+        https://github.com/coursera/courseraprogramming""",
         parents=[utils.docker_client_arg_parser()])
     parser.add_argument('-c', '--config', help='the configuration file to use')
 
@@ -49,23 +50,26 @@ def build_parser():
     # from there.
     subparsers = parser.add_subparsers()
 
+    # create the parser for the cat command
+    commands.cat.parser(subparsers)
+
     # create the parser for the configure subcommand. (authentication / etc.)
     commands.config.parser(subparsers)
 
-    # create the parser for the version subcommand.
-    commands.version.parser(subparsers)
+    # create the parser for the grade subcommand.
+    commands.grade.parser(subparsers)
 
-    # create the parser for the sanity check command
-    commands.sanity.parser(subparsers)
+    # create the parser for the inspect command
+    commands.inspect.parser(subparsers)
 
     # create the parser for the ls command
     commands.ls.parser(subparsers)
 
-    # create the parser for the cat command
-    commands.cat.parser(subparsers)
+    # create the parser for the sanity check command
+    commands.sanity.parser(subparsers)
 
-    # create the parser for the inspect command
-    commands.inspect.parser(subparsers)
+    # create the parser for the version subcommand.
+    commands.version.parser(subparsers)
 
     # create the parser for the run command?
 

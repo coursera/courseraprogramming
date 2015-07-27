@@ -59,8 +59,6 @@ def test_command_sanity():
     for testcase in testCases:
         testFn = command_sanity_impl
         testFn.description = 'test_command_sanity: %s' % testcase[0]
-        print ":LKJSDF:LSKJDF:LSJKDF:LKSJ:DFLKJSD:LFKJL:JE"
-        print "Test name: %s, input: %s, output: %s" % testcase
         yield testFn, testcase[1], testcase[2]
 
 

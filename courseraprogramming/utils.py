@@ -64,9 +64,9 @@ def set_logging_level(args):
             sys.exit(2)
     elif "quiet" in args and args.quiet is not None:
         if args.quiet > 1:
-            level = logging.CRITICAL
-        elif args.quiet > 0:
             level = logging.ERROR
+        elif args.quiet > 0:
+            level = logging.WARNING
         else:
             logging.critical("quiet is an unexpected value. (%s) exiting.",
                              args.quiet)

@@ -4,12 +4,16 @@ courseraprogramming
 .. image:: https://travis-ci.org/coursera/courseraprogramming.svg
     :target: https://travis-ci.org/coursera/courseraprogramming
 
-The grid sdk is a software development toolkit that helps to develop
+This command-line tool is a software development toolkit that helps to develop
 asynchronous graders for Coursera (typically programming assignments).
 
 To install this sdk, simply execute::
 
     sudo pip install courseraprogramming
+
+The tool includes its own usage information. Simply run::
+
+    courseraprogramming -h
 
 Developing
 ----------
@@ -33,9 +37,5 @@ Code Style
 
 Code should conform to pep8 style requirements. To check, simply run::
 
-    pep8 *.py
+    pep8 courseraprogramming tests
 
-Distributing
-^^^^^^^^^^^^
-
-TODO: package according to the latest best practices.
