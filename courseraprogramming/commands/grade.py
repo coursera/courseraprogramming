@@ -98,11 +98,11 @@ def command_grade_local(args):
         logging.debug("Volume string: %s", volume_str)
         container = d.create_container(
             image=args.containerId,
-            network_disabled=True,
             user='%s' % 1000,
-            host_config=docker.utils.create_host_config(binds=[
-                volume_str,
-            ]))
+            host_config=docker.utils.create_host_config(
+                binds=[volume_str, ],
+                network_mode='none',
+            ))
     except:
         logging.error(
             "Could not set up the container to run the grade command in. Most "

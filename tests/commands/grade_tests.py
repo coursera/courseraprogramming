@@ -165,11 +165,11 @@ def test_command_local_grade_simple(run_container, utils, common):
 
     docker_mock.create_container.assert_called_with(
         image='myContainerId',
-        network_disabled=True,
         user='1000',
-        host_config=docker.utils.create_host_config(binds=[
-            'foo',
-        ])
+        host_config=docker.utils.create_host_config(
+            binds=['foo', ],
+            network_mode='none',
+        )
     )
     run_container.assert_called_with(
         docker_mock,
