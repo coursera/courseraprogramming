@@ -34,6 +34,32 @@ def test_ls_run(os):
     args = argparse.Namespace()
     args.containerId = 'testContainerId'
     args.shell = '/bin/bash'
+    args.allow_network = False
+
+    # Run the command
+    inspect.command_inspect(args)
+
+    # Verify correct command output
+    os.execvp.assert_called_with('docker', [
+        'docker',
+        'run',
+        '-it',
+        '--entrypoint',
+        '/bin/bash',
+        '--net',
+        'none',
+        'testContainerId',
+    ])
+
+
+@patch('courseraprogramming.commands.inspect.os')
+def test_ls_run_with_network(os):
+
+    # Set up args
+    args = argparse.Namespace()
+    args.containerId = 'testContainerId'
+    args.shell = '/bin/bash'
+    args.allow_network = True
 
     # Run the command
     inspect.command_inspect(args)

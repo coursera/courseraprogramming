@@ -37,6 +37,9 @@ def command_inspect(args):
     if 'submission' in args and args.submission is not None:
         command_line.append('-v')
         command_line.append(common.mk_submission_volume_str(args.submission))
+    if not args.allow_network:
+        command_line.append('--net')
+        command_line.append('none')
     command_line.append(args.containerId)
     logging.debug("About to execute command: %s", ' '.join(command_line))
     os.execvp('docker', command_line)
@@ -61,4 +64,8 @@ def parser(subparsers):
         '--submission',
         help='Submission directory to mount into the container.',
         type=common.arg_fq_dir)
+    parser_inspect.add_argument(
+        '--allow-network',
+        action='store_true',
+        help='Enable network access within the container. (Default off.)')
     return parser_inspect
