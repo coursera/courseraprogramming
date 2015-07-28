@@ -169,7 +169,8 @@ def test_command_local_grade_simple(run_container, utils, common):
         host_config=docker.utils.create_host_config(
             binds=['foo', ],
             network_mode='none',
-        )
+        ),
+        mem_limit='1g',
     )
     run_container.assert_called_with(
         docker_mock,
