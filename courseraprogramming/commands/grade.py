@@ -102,7 +102,9 @@ def command_grade_local(args):
             host_config=docker.utils.create_host_config(
                 binds=[volume_str, ],
                 network_mode='none',
-            ))
+            ),
+            mem_limit='1g',
+        )
     except:
         logging.error(
             "Could not set up the container to run the grade command in. Most "

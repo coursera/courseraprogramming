@@ -35,6 +35,7 @@ def test_ls_run(os):
     args.containerId = 'testContainerId'
     args.shell = '/bin/bash'
     args.allow_network = False
+    args.unlimited_memory = False
 
     # Run the command
     inspect.command_inspect(args)
@@ -48,18 +49,21 @@ def test_ls_run(os):
         '/bin/bash',
         '--net',
         'none',
+        '-m',
+        '1g',
         'testContainerId',
     ])
 
 
 @patch('courseraprogramming.commands.inspect.os')
-def test_ls_run_with_network(os):
+def test_ls_run_without_limits(os):
 
     # Set up args
     args = argparse.Namespace()
     args.containerId = 'testContainerId'
     args.shell = '/bin/bash'
     args.allow_network = True
+    args.unlimited_memory = True
 
     # Run the command
     inspect.command_inspect(args)

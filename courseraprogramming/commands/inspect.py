@@ -40,6 +40,9 @@ def command_inspect(args):
     if not args.allow_network:
         command_line.append('--net')
         command_line.append('none')
+    if not args.unlimited_memory:
+        command_line.append('-m')
+        command_line.append('1g')
     command_line.append(args.containerId)
     logging.debug("About to execute command: %s", ' '.join(command_line))
     os.execvp('docker', command_line)
@@ -68,4 +71,8 @@ def parser(subparsers):
         '--allow-network',
         action='store_true',
         help='Enable network access within the container. (Default off.)')
+    parser_inspect.add_argument(
+        '--unlimited-memory',
+        action='store_true',
+        help='Remove memory limits. (Default: limited memory.)')
     return parser_inspect
