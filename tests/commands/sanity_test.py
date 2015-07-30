@@ -62,6 +62,15 @@ def test_command_sanity():
             "EXPOSE 80"], (
             ('root', 'WARNING', 'Line 3: EXPOSE commands do not work for '
                 'graders'),)),
+        ("env_commands", [
+            "FROM debian\n",
+            "\n",
+            "ENV FOO=bar\n",
+            "ENTRYPOINT /grader.sh\n"], (
+            ('root', 'WARNING', 'Line 2: ENV-based environment variables '
+                'are stripped in the production environment for security '
+                'reasons. Please set any environment variables you need '
+                'in your grading script.'),)),
         ("good_script", [
             "FROM debian\n",
             "\n",

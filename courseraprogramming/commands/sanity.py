@@ -88,6 +88,14 @@ def command_sanity(args):
                         'graders', {
                             'lineno': cmd['startline'],
                         })
+                if cmd['instruction'].lower() == 'env':
+                    logging.warn(
+                        'Line %(lineno)s: ENV-based environment variables are '
+                        'stripped in the production environment for security '
+                        'reasons. Please set any environment variables you '
+                        'need in your grading script.', {
+                            'lineno': cmd['startline'],
+                        })
             if not seen_entrypoint:
                 logging.warn('Your Dockerfile must define an ENTRYPOINT.')
     else:
