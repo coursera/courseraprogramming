@@ -11,7 +11,12 @@ To install this sdk, simply execute::
 
     sudo pip install courseraprogramming
 
-The tool includes its own usage information. Simply run::
+`pip <https://pip.pypa.io/en/latest/index.html>`_ is a python package manager.
+If you do not have ``pip`` installed on your machine, please follow the
+installation instructions for your platform found at:
+<https://pip.pypa.io/en/latest/installing.html#install-or-upgrade-pip>
+
+The tool includes its own usage information and documentation. Simply run::
 
     courseraprogramming -h
 
