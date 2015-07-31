@@ -96,6 +96,13 @@ def command_sanity(args):
                         'need in your grading script.', {
                             'lineno': cmd['startline'],
                         })
+                if cmd['instruction'].lower() == 'volume':
+                    logging.warn(
+                        'Line %(lineno)s: VOLUME commands are stripped in '
+                        'the production environment, and will likely not work '
+                        'as expected.', {
+                            'lineno': cmd['startline'],
+                        })
             if not seen_entrypoint:
                 logging.warn('Your Dockerfile must define an ENTRYPOINT.')
     else:

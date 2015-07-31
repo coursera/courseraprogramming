@@ -33,9 +33,9 @@ def test_command_sanity():
     "Test generator to test a number of different sanity cases"
     testCases = [
         ("general1", [
-            "FROM ubuntu:latest\n",
-            "\n",
-            "COPY foo foo\n"], (
+            "FROM ubuntu:latest",
+            "",
+            "COPY foo foo"], (
             ('root', 'INFO', 'Line 0: We recommend using debian, or other '
                 'smaller base images.'),
             ('root', 'WARNING', 'Line 2: Copy destination should always start '
@@ -43,38 +43,46 @@ def test_command_sanity():
             ('root', 'WARNING', 'Your Dockerfile must define an ENTRYPOINT.'),
             )),
         ("doubleEntrypoint", [
-            "FROM debian\n",
-            "\n",
-            "ENTRYPOINT /grader.sh\n",
+            "FROM debian",
+            "",
+            "ENTRYPOINT /grader.sh",
             "ENTRYPOINT /other_grader.sh"], (
             ('root', 'WARNING', 'Line 3: Re-defining entrypoint of '
                 'container.'),)),
         ("bash_entrypoint", [
-            "FROM debian\n",
-            "\n",
+            "FROM debian",
+            "",
             "ENTRYPOINT /bin/bash"], (
             ('root', 'WARNING', 'Line 2: Please mark your grading script or '
                 'binary as the ENTRYPOINT, and not bash'),)),
         ("expose_command", [
-            "FROM debian\n",
-            "\n",
-            "ENTRYPOINT /grader.sh\n",
+            "FROM debian",
+            "",
+            "ENTRYPOINT /grader.sh",
             "EXPOSE 80"], (
             ('root', 'WARNING', 'Line 3: EXPOSE commands do not work for '
                 'graders'),)),
         ("env_commands", [
-            "FROM debian\n",
-            "\n",
-            "ENV FOO=bar\n",
-            "ENTRYPOINT /grader.sh\n"], (
+            "FROM debian",
+            "",
+            "ENV FOO=bar",
+            "ENTRYPOINT /grader.sh"], (
             ('root', 'WARNING', 'Line 2: ENV-based environment variables '
                 'are stripped in the production environment for security '
                 'reasons. Please set any environment variables you need '
                 'in your grading script.'),)),
+        ("volume_commands", [
+            'FROM debian',
+            '',
+            'VOLUME /myScratchDir',
+            'ENTRYPOINT /grader.sh'], (
+            ('root', 'WARNING', 'Line 2: VOLUME commands are stripped in the '
+                'production environment, and will likely not work as '
+                'expected.'),)),
         ("good_script", [
-            "FROM debian\n",
-            "\n",
-            "ENTRYPOINT /grader.sh\n"], ()),
+            "FROM debian",
+            "",
+            "ENTRYPOINT /grader.sh"], ()),
     ]
     for testcase in testCases:
         testFn = command_sanity_impl
@@ -85,7 +93,7 @@ def test_command_sanity():
 def command_sanity_impl(dockerFile, expectedLogs):
     print "TESTING %s WITH %s" % (dockerFile, expectedLogs)
     with LogCapture() as logs:
-        open_ = mock_open(read_data=''.join(dockerFile))
+        open_ = mock_open(read_data='\n'.join(dockerFile))
         open_().readlines.return_value = dockerFile
         with patch.object(builtins, 'open', open_, create=True):
             args = argparse.Namespace()
