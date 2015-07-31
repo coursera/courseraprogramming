@@ -36,6 +36,7 @@ def test_ls_run(os):
     args.shell = '/bin/bash'
     args.allow_network = False
     args.unlimited_memory = False
+    args.super_user = False
 
     # Run the command
     inspect.command_inspect(args)
@@ -51,6 +52,8 @@ def test_ls_run(os):
         'none',
         '-m',
         '1g',
+        '-u',
+        '1000',
         'testContainerId',
     ])
 
@@ -64,6 +67,7 @@ def test_ls_run_without_limits(os):
     args.shell = '/bin/bash'
     args.allow_network = True
     args.unlimited_memory = True
+    args.super_user = True
 
     # Run the command
     inspect.command_inspect(args)
