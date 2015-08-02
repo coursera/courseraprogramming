@@ -43,6 +43,10 @@ def command_inspect(args):
     if not args.unlimited_memory:
         command_line.append('-m')
         command_line.append('1g')
+    if not args.super_user:
+        # Note: docker run CLI doesn't support setting the group. :-(
+        command_line.append('-u')
+        command_line.append('1000')
     command_line.append(args.containerId)
     logging.debug("About to execute command: %s", ' '.join(command_line))
     os.execvp('docker', command_line)
@@ -75,4 +79,8 @@ def parser(subparsers):
         '--unlimited-memory',
         action='store_true',
         help='Remove memory limits. (Default: limited memory.)')
+    parser_inspect.add_argument(
+        '--super-user',
+        action='store_true',
+        help='Inspect as super-user. (Default: userid 1000.)')
     return parser_inspect
