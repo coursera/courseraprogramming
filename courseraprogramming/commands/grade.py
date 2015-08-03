@@ -102,8 +102,9 @@ def command_grade_local(args):
             host_config=docker.utils.create_host_config(
                 binds=[volume_str, ],
                 network_mode='none',
+                mem_limit='1g',
+                memswap_limit='1g',
             ),
-            mem_limit='1g',
         )
     except:
         logging.error(
