@@ -20,15 +20,25 @@ Coursera's asynchronous grader command line SDK.
 You may install it from source, or via pip.
 """
 
+from courseraprogramming.commands import oauth2
+import requests
 import logging
 import sys
 
 
 def command_config(args):
     "Implements the configure subcommand"
-    # TODO: IMPLEMENT ME!
-    logging.fatal('The upload subcommand is not implemented! :-( Sorry!')
-    sys.exit(3)
+    # TODO: check for existance of ~/.coursera directory and create it if
+    # required.
+
+    cfg = oauth2.configuration()
+    auth = oauth2.build_authorizer(args, cfg)
+    whoami_url = \
+        'https://api.coursera.org/api/externalBasicProfiles.v1?q=me&fields=name,locale,timezone,privacy'
+    r = requests.get(whoami_url, auth=auth)
+    print r.status_code
+    print r.json()
+    print ''
 
 
 def parser(subparsers):
@@ -38,5 +48,4 @@ def parser(subparsers):
         'configure',
         help='Configure %(prog)s for operation!')
     parser_config.set_defaults(func=command_config)
-
     return parser_config
