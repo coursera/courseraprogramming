@@ -31,8 +31,8 @@ def command_config(args):
     # TODO: check for existance of ~/.coursera directory and create it if
     # required.
 
-    cfg = oauth2.configuration()
-    auth = oauth2.build_authorizer(args, cfg)
+    oauth2_instance = oauth2.build_oauth2(args)
+    auth = oauth2_instance.build_authorizer()
     whoami_url = \
         'https://api.coursera.org/api/externalBasicProfiles.v1?q=me&fields=name,locale,timezone,privacy'
     r = requests.get(whoami_url, auth=auth)
