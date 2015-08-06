@@ -18,7 +18,13 @@ from courseraprogramming import main
 from courseraprogramming.commands import config
 
 
-def test_config_parsing():
+def test_config_parsing_check_auth():
     parser = main.build_parser()
-    args = parser.parse_args('configure'.split())
-    assert args.func == config.command_config
+    args = parser.parse_args('configure check-auth'.split())
+    assert args.func == config.check_auth
+
+
+def test_config_parsing_check_auth():
+    parser = main.build_parser()
+    args = parser.parse_args('configure display-auth-cache'.split())
+    assert args.func == config.display_auth_cache

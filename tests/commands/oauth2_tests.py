@@ -50,7 +50,8 @@ def test_compute_cache_filename():
     cfg = ConfigParser.ConfigParser()
     cfg.add_section('oauth2')
     cfg.set('oauth2', 'token_cache', '/tmp/configured_cache')
-    assert oauth2.build_oauth2(args, cfg).token_cache_file == '/tmp/configured_cache'
+    assert oauth2.build_oauth2(args, cfg).token_cache_file == \
+        '/tmp/configured_cache'
 
 
 def test_compute_cache_filname_expanded_path():
@@ -174,14 +175,14 @@ def test_loading_cache():
 
     test_cases = [
         # TODO: figure out why this test isn't working.
-        #('valid_tokens', cPickle.dumps(valid_tokens), valid_tokens),
+        # ('valid_tokens', cPickle.dumps(valid_tokens), valid_tokens),
         ('invalid pickle', cPickle.dumps(valid_tokens)[5:], None),
         ('garbage', ';lkajsdf;lkjasdlfk;j', None),
         ('bad object', cPickle.dumps({'weird': 'stuff'}), None),
     ]
 
     for test_case in test_cases:
-        #loading_cache_checker.description = test_case[0]
+        # loading_cache_checker.description = test_case[0]
         yield loading_cache_checker, test_case[1], test_case[2]
 
 

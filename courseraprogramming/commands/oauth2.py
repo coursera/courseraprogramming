@@ -138,6 +138,8 @@ def _make_handler(state_token, done_function):
 
     return LocalServerHandler
 
+OAUTH2_URL_BASE = 'https://accounts.coursera.org/oauth2/v1/'
+
 
 class CourseraOAuth2(object):
     '''
@@ -163,8 +165,8 @@ class CourseraOAuth2(object):
                  client_id,
                  client_secret,
                  scopes,
-                 auth_endpoint='https://accounts.coursera.org/oauth2/v1/auth',
-                 token_endpoint='https://accounts.coursera.org/oauth2/v1/token',
+                 auth_endpoint=OAUTH2_URL_BASE+'auth',
+                 token_endpoint=OAUTH2_URL_BASE+'token',
                  verify_tls=True,
                  token_cache_file='~/.coursera/oauth2_cache.pickle',
                  local_webserver_port=9876):
@@ -429,7 +431,7 @@ class CourseraOAuth2(object):
                                   self.token_cache['expires'])
 
 
-def build_oauth2(args, cfg):
+def build_oauth2(args, cfg=None):
     if cfg is None:
         cfg = configuration()
 
