@@ -400,7 +400,9 @@ class CourseraOAuth2(object):
                 'client_secret': self.client_secret,
             }
             try:
-                return self._request_tokens_from_token_endpoint(refresh_form)
+                tokens = self._request_tokens_from_token_endpoint(refresh_form)
+                tokens['refresh'] = self.token_cache['refresh']
+                return tokens
             except OAuth2Exception:
                 logging.exception(
                     'Encountered an exception during refresh token flow.')
