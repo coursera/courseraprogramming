@@ -23,6 +23,7 @@ You may install it from source, or via pip.
 import argparse
 from docker.client import Client
 from docker.utils import kwargs_from_env
+import requests
 import logging
 import sys
 from sys import platform as _platform
@@ -46,6 +47,12 @@ def add_logging_parser(main_parser):
         help='Output less information to the console during operation. Can be \
             specified multiple times.')
 
+    main_parser.add_argument(
+        '--silence-urllib3',
+        action='store_true',
+        help='Silence urllib3 warnings. See '
+        'https://urllib3.readthedocs.org/en/latest/security.html for details.')
+
     return verbosity_group
 
 
@@ -53,7 +60,9 @@ def set_logging_level(args):
     "Computes and sets the logging level from the parsed arguments."
     root_logger = logging.getLogger()
     level = logging.INFO
+    logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
     if "verbose" in args and args.verbose is not None:
+        logging.getLogger('requests.packages.urllib3').setLevel(0)  # Unset
         if args.verbose > 1:
             level = 5  # "Trace" level
         elif args.verbose > 0:
@@ -72,6 +81,10 @@ def set_logging_level(args):
                              args.quiet)
     if level is not None:
         root_logger.setLevel(level)
+
+    if args.silence_urllib3:
+        # See: https://urllib3.readthedocs.org/en/latest/security.html
+        requests.packages.urllib3.disable_warnings()
 
 
 def docker_client_arg_parser():
