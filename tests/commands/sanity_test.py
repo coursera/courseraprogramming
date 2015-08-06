@@ -20,7 +20,6 @@ from courseraprogramming.commands import sanity
 from mock import mock_open, patch
 from testfixtures import LogCapture
 
-
 # Set up mocking of the `open` call. See http://www.ichimonji10.name/blog/6/
 from sys import version_info
 if version_info.major == 2:
