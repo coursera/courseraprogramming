@@ -24,6 +24,7 @@ import argparse
 from courseraprogramming import commands
 from courseraprogramming import utils
 import logging
+import sys
 
 
 def build_parser():
@@ -88,7 +89,12 @@ def main():
     # Configure logging
     args.setup_logging(args)
     # Dispatch into the appropriate subcommand function.
-    args.func(args)
+    try:
+        return args.func(args)
+    except:
+        logging.exception('Problem when running command. Sorry!')
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
