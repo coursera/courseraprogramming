@@ -171,6 +171,58 @@ def poll_transloadit(args, upload_url):
                 return (match.group(1), match.group(2))
 
 
+def lookup_course_information(args, auth):
+    'Lookups up a course to get the course id / name / etc.'
+    if re.match('[A-z0-9_-]{22}', args.course):
+        logging.debug('Requesting course info based on id.')
+        # Assume they passed us a course id.
+        course_response = requests.get(
+            '%s/%s' % (args.course_info_endpoint, args.course),
+            auth=auth)
+    else:
+        # Assume they passed us a course slug.
+        logging.debug('Requesting course info based on slug.')
+        params = {
+            'q': 'slug',
+            'slug': args.course
+        }
+        course_response = requests.get(
+            args.course_info_endpoint,
+            params=params,
+            auth=auth)
+    logging.debug('Course response body: %s', course_response.text)
+    if course_response.status_code != 200:
+        logging.error(
+            'Could not look up the course. %s',
+            course_response.text)
+        raise Exception('Failed to find course on coursera.')
+    try:
+        course = course_response.json()['elements'][0]
+        args.course_id = course['id']
+        args.course_slug = course['slug']
+    except:
+        logging.exception(
+            'Error while handling the response from the course info '
+            'endpoint. Response body: %s',
+            course_response.text)
+        raise
+
+
+def output_courtesy_link(args):
+    if not args.quiet > 0:
+        sys.stdout.write(
+            'Edit assignment descriptions, passing thresholds, and publish '
+            'the new course grader at:\n\t')
+        courtesy_link_path = '/teach/%(slug)s/author/programming/%(item)s/' % {
+            'slug': args.course_slug,
+            'item': args.item
+        }
+        courtesy_link = 'https://www.coursera.org' + courtesy_link_path
+        sys.stdout.write(courtesy_link)
+        sys.stdout.write('\n')
+        sys.stdout.flush()
+
+
 def command_upload(args):
     "Implements the upload subcommand"
     d = utils.docker_client(args)
@@ -178,6 +230,7 @@ def command_upload(args):
 
     oauth2_instance = oauth2.build_oauth2(args)
     auth = oauth2_instance.build_authorizer()
+    lookup_course_information(args, auth)
     # TODO: use transloadit's signatures for upload signing.
     # authorization = authorize_upload(args, auth)
 
@@ -238,7 +291,7 @@ def command_upload(args):
     # Rebuild an authorizer to ensure it's fresh and not expired
     auth = oauth2_instance.build_authorizer()
     register_request = {
-        'courseId': args.course,
+        'courseId': args.course_id,
         'bucket': upload_information[0],
         'key': upload_information[1],
     }
@@ -269,7 +322,7 @@ def command_upload(args):
 
     update_assignment_params = {
         'action': args.update_part_action,
-        'id': '%s~%s' % (args.course, args.item),
+        'id': '%s~%s' % (args.course_id, args.item),
         'partId': args.part,
         'executorId': grader_id,
     }
@@ -287,6 +340,7 @@ def command_upload(args):
         return 1
     logging.info('Successfully updated assignment part %s to new executor %s',
                  args.part, grader_id)
+    output_courtesy_link(args)
     return 0
 
 
@@ -350,5 +404,10 @@ def parser(subparsers):
         '--update-part-action',
         default='setGridExecutorId',
         help='The name of the Naptime action called to update the assignment')
+
+    parser_upload.add_argument(
+        '--course-info-endpoint',
+        default='https://api.coursera.org/api/onDemandCourses.v1',
+        help='Override the endpoint used to look up course information.')
 
     return parser_upload
