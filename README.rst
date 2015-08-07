@@ -81,7 +81,9 @@ handle problematic submissions.
 upload
 ^^^^^^
 
-Coming soon: allows for a CLI-based upload workflow for instructional teams.
+Allows an instructional team to upload their containers to Coursera without
+using a web browser. It is designed to even work in an unattended fashion (i.e.
+from a jenkins job).
 
 Bugs / Issues / Feature Requests
 --------------------------------
