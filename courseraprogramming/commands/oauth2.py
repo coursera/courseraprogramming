@@ -25,6 +25,7 @@ import logging
 import requests
 import io
 import os
+import os.path
 import subprocess
 import sys
 import time
@@ -178,6 +179,19 @@ class CourseraOAuth2(object):
         self.token_endpoint = token_endpoint
         self.verify_tls = verify_tls
         self.token_cache_file = os.path.expanduser(token_cache_file)
+        # Create the appropriate directory if not already in existance.
+        if not os.path.isfile(self.token_cache_file):
+            dir_name = os.path.dirname(self.token_cache_file)
+            try:
+                os.makedirs(dir_name, mode=0700)
+            except:
+                logging.debug(
+                    'Encountered an exception creating directory for token '
+                    'cache file. Ignoring...',
+                    exc_info=True)
+        else:
+            # TODO: check file permissions to ensure not world readable.
+            pass
         # If not None, run a local webserver to hear the callback.
         self.local_webserver_port = local_webserver_port
         self._token_cache = None
@@ -391,7 +405,7 @@ class CourseraOAuth2(object):
 
     def _exchange_refresh_tokens(self):
         'Exchanges a refresh token for an access token'
-        if 'refresh' in self.token_cache:
+        if self.token_cache is not None and 'refresh' in self.token_cache:
             # Attempt to use the refresh token to get a new access token.
             refresh_form = {
                 'grant_type': 'refresh_token',
