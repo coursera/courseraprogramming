@@ -64,13 +64,27 @@ def run_container(docker, container, args):
         logging.error("The output was not a valid JSON document.")
         error_in_grader_output = True
     else:
-        if "isCorrect" not in parsed_output:
-            logging.error("Field 'isCorrect' not present in parsed output.")
+        if "fractionalScore" in parsed_output:
+            if isinstance(parsed_output['fractionalScore'], bool):
+                logging.error("Field 'fractionalScore' must be a decimal.")
+                error_in_grader_output = True
+            elif not (isinstance(parsed_output['fractionalScore'], float) or
+                      isinstance(parsed_output['fractionalScore'], int)):
+                logging.error("Field 'fractionalScore' must be a decimal.")
+                error_in_grader_output = True
+            elif parsed_output['fractionalScore'] > 1:
+                logging.error("Field 'fractionalScore' must be <= 1.")
+                error_in_grader_output = True
+            elif parsed_output['fractionalScore'] < 0:
+                logging.error("Field 'fractionalScore' must be >= 0.")
+                error_in_grader_output = True
+        elif "isCorrect" in parsed_output:
+            if not isinstance(parsed_output['isCorrect'], bool):
+                logging.error("Field 'isCorrect' is not a boolean value.")
+                error_in_grader_output = True
+        else:
+            logging.error("Required field 'fractionalScore' is missing.")
             error_in_grader_output = True
-        elif not isinstance(parsed_output['isCorrect'], bool):
-            logging.error("Field 'isCorrect' is not a boolean value.")
-            error_in_grader_output = True
-
         if "feedback" not in parsed_output:
             logging.error("Field 'feedback' not present in parsed output.")
             error_in_grader_output = True

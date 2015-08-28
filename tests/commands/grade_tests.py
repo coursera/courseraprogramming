@@ -81,6 +81,126 @@ def test_check_output_no_feedback(sys):
 
 
 @patch('courseraprogramming.commands.grade.sys')
+def test_check_output_fractional_score_boolean(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore": false, "feedback": "wheeeee"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+        ('root', 'ERROR', "Field 'fractionalScore' must be a decimal.")
+    )
+    sys.exit.assert_called_with(1)
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_fractional_score_string(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore": "0.3", "feedback": "wheeeee"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+        ('root', 'ERROR', "Field 'fractionalScore' must be a decimal.")
+    )
+    sys.exit.assert_called_with(1)
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_fractional_score_too_high(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore":1.1, "feedback": "wheeeee"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+        ('root', 'ERROR', "Field 'fractionalScore' must be <= 1.")
+    )
+    sys.exit.assert_called_with(1)
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_fractional_score_too_low(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore":-1.1, "feedback": "wheeeee"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+        ('root', 'ERROR', "Field 'fractionalScore' must be >= 0.")
+    )
+    sys.exit.assert_called_with(1)
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_missing_grade(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"feedback": "wheeeee"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+        ('root', 'ERROR', "Required field 'fractionalScore' is missing.")
+    )
+    sys.exit.assert_called_with(1)
+
+
+@patch('courseraprogramming.commands.grade.sys')
 def test_check_output_malformed_output(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
@@ -125,7 +245,7 @@ def test_check_output_bad_return_code(sys):
 
 
 @patch('courseraprogramming.commands.grade.sys')
-def test_check_output_good_output(sys):
+def test_check_output_good_output_is_correct(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
@@ -138,6 +258,121 @@ def test_check_output_good_output(sys):
         docker_mock.logs.side_effect = [
             '',
             '{"isCorrect":false, "feedback": "Helpful comment!"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+    )
+    assert not sys.exit.called, "sys.exit should not be called!"
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_good_output_fractional_score(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore":0.2, "feedback": "Helpful comment!"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+    )
+    assert not sys.exit.called, "sys.exit should not be called!"
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_good_output_fractional_score_one(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore":1, "feedback": "Helpful comment!"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+    )
+    assert not sys.exit.called, "sys.exit should not be called!"
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_good_output_fractional_score_one_point_oh(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore":1.0, "feedback": "Helpful comment!"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+    )
+    assert not sys.exit.called, "sys.exit should not be called!"
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_good_output_fractional_score_zero(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore":0, "feedback": "Helpful comment!"}'
+        ]
+        # Run the function under test
+        grade.run_container(docker_mock, container, args)
+    logs.check(
+        ('root', 'INFO', 'Debug log:'),
+    )
+    assert not sys.exit.called, "sys.exit should not be called!"
+
+
+@patch('courseraprogramming.commands.grade.sys')
+def test_check_output_good_output_fractional_score_zero_point_oh(sys):
+    with LogCapture() as logs:
+        docker_mock = MagicMock()
+        container = {
+            "Id": "myContainerId"
+        }
+        args = argparse.Namespace()
+        args.timeout = 300
+
+        docker_mock.wait.return_value = 0
+        docker_mock.logs.side_effect = [
+            '',
+            '{"fractionalScore":0.0, "feedback": "Helpful comment!"}'
         ]
         # Run the function under test
         grade.run_container(docker_mock, container, args)
