@@ -83,7 +83,12 @@ upload
 
 Allows an instructional team to upload their containers to Coursera without
 using a web browser. It is designed to even work in an unattended fashion (i.e.
-from a jenkins job).
+from a jenkins job). In order to make the upload command work from a Jenkins
+automated build machine, simply copy the `~/.coursera` directory from a working
+machine, and install it in the jenkins home folder. Beware that the oauth2_cache
+file within that directory contains a refresh token for the user who authorized
+themselves. This refresh token should be treated as if it were a password and
+not shared or otherwise disclosed!
 
 Bugs / Issues / Feature Requests
 --------------------------------
