@@ -113,7 +113,7 @@ def command_grade_local(args):
         container = d.create_container(
             image=args.containerId,
             user='%s' % 1000,
-            host_config=docker.utils.create_host_config(
+            host_config=d.create_host_config(
                 binds=[volume_str, ],
                 network_mode='none',
                 mem_limit='1g',
