@@ -105,7 +105,6 @@ def command_grade_local(args):
     The 'local' sub-sub-command of the 'grade' sub-command simulates running a
     grader on a sample submission from the local file system.
     """
-    # TODO: Support arguments to pass to the graders.
     d = utils.docker_client(args)
     try:
         volume_str = common.mk_submission_volume_str(args.dir)
@@ -119,8 +118,8 @@ def command_grade_local(args):
         user = '%s' % 1000
 
         if 'args' in args and len(args.args) > 0:
-            # Handle additional command-line arguments which should
-            # be added to those in the ENTRYPOINT from the Dockerfile.
+            # Handle additional command-line arguments which will
+            # be passed to the grader.
             inspect = d.inspect_image(image=args.containerId)
             cmd = inspect['Config']['Entrypoint']
             if not type(cmd) is list:
