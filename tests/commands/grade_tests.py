@@ -31,6 +31,15 @@ def test_grade_local_parsing():
     assert args.containerId == 'myContainerId'
     assert args.dir == '/tmp'
 
+def test_grade_local_parsing_with_extra_args():
+    parser = main.build_parser()
+    args = parser.parse_args(
+        'grade local myContainerId /tmp arg1 arg2'.split())
+    assert args.func == grade.command_grade_local
+    assert args.containerId == 'myContainerId'
+    assert args.dir == '/tmp'
+    assert args.args == ['arg1', 'arg2']
+
 
 @patch('courseraprogramming.commands.grade.sys')
 def test_check_output_bad_isCorrect(sys):
@@ -400,6 +409,44 @@ def test_command_local_grade_simple(run_container, utils, common):
 
     docker_mock.create_container.assert_called_with(
         image='myContainerId',
+        user='1000',
+        host_config=docker.utils.create_host_config(
+            binds=['foo', ],
+            network_mode='none',
+            mem_limit='1g',
+            memswap_limit='1g',
+        ),
+    )
+    run_container.assert_called_with(
+        docker_mock,
+        docker_mock.create_container.return_value,
+        args)
+
+@patch('courseraprogramming.commands.grade.common')
+@patch('courseraprogramming.commands.grade.utils')
+@patch('courseraprogramming.commands.grade.run_container')
+def test_command_local_grade_with_extra_args(run_container, utils, common):
+    args = argparse.Namespace()
+    args.dir = '/tmp'
+    args.containerId = 'myContainerId'
+    args.args = ['extra', 'args']
+    common.mk_submission_volume_str.return_value = 'foo'
+    docker_mock = MagicMock()
+    docker_mock.create_container.return_value = {
+        "Id": "myContainerInstanceId",
+    }
+    docker_mock.inspect_image.return_value = {
+        "Config": {
+            "Entrypoint": ["command"],
+        }
+    }
+    utils.docker_client.return_value = docker_mock
+
+    grade.command_grade_local(args)
+
+    docker_mock.create_container.assert_called_with(
+        image='myContainerId',
+        command=['command', 'extra', 'args'],
         user='1000',
         host_config=docker.utils.create_host_config(
             binds=['foo', ],
