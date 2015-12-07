@@ -395,7 +395,7 @@ def test_command_local_grade_simple(run_container, utils, common):
         "Id": "myContainerInstanceId",
     }
     utils.docker_client.return_value = docker_mock
-    h_config = {'foo': 'bar'} # just some unique value
+    h_config = {'foo': 'bar'}  # just some unique value
     docker_mock.create_host_config.return_value = h_config
 
     grade.command_grade_local(args)
