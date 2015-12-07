@@ -123,12 +123,13 @@ def command_grade_local(args):
             inspect = d.inspect_image(image=args.containerId)
             cmd = inspect['Config']['Entrypoint']
             if not type(cmd) is list:
-                logging.error('ENTRYPOINT in Dockerfile must be a list in order to pass in command-line arguments')
+                logging.error('ENTRYPOINT in Dockerfile must be a list in ' +
+                              'order to pass in command-line arguments')
                 raise
             cmd.extend(args.args)
             container = d.create_container(
                 image=args.containerId,
-                command = cmd,
+                command=cmd,
                 user=user,
                 host_config=host_config,
             )
@@ -177,6 +178,6 @@ def parser(subparsers):
         type=common.arg_fq_dir)
     parser_grade_local.add_argument(
         'args',
-        nargs = argparse.REMAINDER,
-        help = 'Arguments to the docker executable')
+        nargs=argparse.REMAINDER,
+        help='Arguments to the docker executable')
     return parser_grade

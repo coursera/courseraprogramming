@@ -31,6 +31,7 @@ def test_grade_local_parsing():
     assert args.containerId == 'myContainerId'
     assert args.dir == '/tmp'
 
+
 def test_grade_local_parsing_with_extra_args():
     parser = main.build_parser()
     args = parser.parse_args(
@@ -421,6 +422,7 @@ def test_command_local_grade_simple(run_container, utils, common):
         docker_mock,
         docker_mock.create_container.return_value,
         args)
+
 
 @patch('courseraprogramming.commands.grade.common')
 @patch('courseraprogramming.commands.grade.utils')
