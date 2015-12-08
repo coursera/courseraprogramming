@@ -396,7 +396,11 @@ def test_check_output_good_output_fractional_score_zero_point_oh(sys):
 @patch('courseraprogramming.commands.grade.utils')
 @patch('courseraprogramming.commands.grade.run_container')
 @patch('courseraprogramming.commands.grade.docker.utils')
-def test_command_local_grade_simple(docker_utils, run_container, utils, common):
+def test_command_local_grade_simple(
+        docker_utils,
+        run_container,
+        utils,
+        common):
     args = argparse.Namespace()
     args.dir = '/tmp'
     args.containerId = 'myContainerId'
