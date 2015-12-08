@@ -105,21 +105,40 @@ def command_grade_local(args):
     The 'local' sub-sub-command of the 'grade' sub-command simulates running a
     grader on a sample submission from the local file system.
     """
-    # TODO: Support arguments to pass to the graders.
     d = utils.docker_client(args)
     try:
         volume_str = common.mk_submission_volume_str(args.dir)
         logging.debug("Volume string: %s", volume_str)
-        container = d.create_container(
-            image=args.containerId,
-            user='%s' % 1000,
-            host_config=docker.utils.create_host_config(
+        host_config = docker.utils.create_host_config(
                 binds=[volume_str, ],
                 network_mode='none',
                 mem_limit='1g',
                 memswap_limit='1g',
-            ),
-        )
+            )
+        user = '%s' % 1000
+
+        if 'args' in args and len(args.args) > 0:
+            # Handle additional command-line arguments which will
+            # be passed to the grader.
+            inspect = d.inspect_image(image=args.containerId)
+            cmd = inspect['Config']['Entrypoint']
+            if not type(cmd) is list:
+                logging.error('ENTRYPOINT in Dockerfile must be a list in ' +
+                              'order to pass in command-line arguments')
+                raise
+            cmd.extend(args.args)
+            container = d.create_container(
+                image=args.containerId,
+                command=cmd,
+                user=user,
+                host_config=host_config,
+            )
+        else:
+            container = d.create_container(
+                image=args.containerId,
+                user=user,
+                host_config=host_config
+            )
     except:
         logging.error(
             "Could not set up the container to run the grade command in. Most "
@@ -157,4 +176,8 @@ def parser(subparsers):
         'dir',
         help='Directory containing the submission.',
         type=common.arg_fq_dir)
+    parser_grade_local.add_argument(
+        'args',
+        nargs=argparse.REMAINDER,
+        help='Arguments to the docker executable')
     return parser_grade
