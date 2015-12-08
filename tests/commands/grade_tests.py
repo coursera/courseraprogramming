@@ -395,31 +395,34 @@ def test_check_output_good_output_fractional_score_zero_point_oh(sys):
 @patch('courseraprogramming.commands.grade.common')
 @patch('courseraprogramming.commands.grade.utils')
 @patch('courseraprogramming.commands.grade.run_container')
-def test_command_local_grade_simple(run_container, utils, common):
+@patch('courseraprogramming.commands.grade.docker.utils')
+def test_command_local_grade_simple(docker_utils, run_container, utils, common):
     args = argparse.Namespace()
     args.dir = '/tmp'
     args.containerId = 'myContainerId'
+
     common.mk_submission_volume_str.return_value = 'foo'
     docker_mock = MagicMock()
     docker_mock.create_container.return_value = {
         "Id": "myContainerInstanceId",
     }
     utils.docker_client.return_value = docker_mock
+
     h_config = {'foo': 'bar'}  # just some unique value
-    docker_mock.create_host_config.return_value = h_config
+    docker_utils.create_host_config.return_value = h_config
 
     grade.command_grade_local(args)
 
-    docker_mock.create_container.assert_called_with(
-        image='myContainerId',
-        user='1000',
-        host_config=h_config,
-    )
-    docker_mock.create_host_config.assert_called_with(
+    docker_utils.create_host_config.assert_called_with(
         binds=['foo', ],
         network_mode='none',
         mem_limit='1g',
         memswap_limit='1g',
+    )
+    docker_mock.create_container.assert_called_with(
+        image='myContainerId',
+        user='1000',
+        host_config=h_config,
     )
     run_container.assert_called_with(
         docker_mock,

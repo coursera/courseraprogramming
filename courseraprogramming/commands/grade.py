@@ -133,7 +133,7 @@ def command_grade_local(args):
             container = d.create_container(
                 image=args.containerId,
                 user=user,
-                host_config=host_config
+                host_config=host_config,
             )
     except:
         logging.error(
