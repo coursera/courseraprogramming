@@ -204,7 +204,7 @@ def command_upload(args):
     p = multiprocessing.Process(target=upload, args=(args, upload_url, image))
     p.daemon = True  # Auto-kill when the main process exits.
     p.start()
-    time.sleep(10)  # Yield control to the child process to kick off upload.
+    time.sleep(20)  # Yield control to the child process to kick off upload.
 
     upload_information = None
 
