@@ -125,7 +125,7 @@ def command_grade_local(args):
             cmd.extend(args.args)
             container = d.create_container(
                 image=args.containerId,
-                command=cmd,
+                entrypoint=cmd,
                 user=user,
                 host_config=host_config,
             )

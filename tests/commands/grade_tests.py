@@ -458,7 +458,7 @@ def test_command_local_grade_with_extra_args(run_container, utils, common):
 
     docker_mock.create_container.assert_called_with(
         image='myContainerId',
-        command=['command', 'extra', 'args'],
+        entrypoint=['command', 'extra', 'args'],
         user='1000',
         host_config=docker.utils.create_host_config(
             binds=['foo', ],
