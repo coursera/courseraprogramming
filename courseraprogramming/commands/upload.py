@@ -267,10 +267,14 @@ def command_upload(args):
 
     logging.info('The grader status API is at: %s', location)
 
+    return update_assignments(auth, grader_id, args)
+
+
+def update_assignment(auth, grader_id, args, item, part):
     update_assignment_params = {
         'action': args.update_part_action,
-        'id': '%s~%s' % (args.course, args.item),
-        'partId': args.part,
+        'id': '%s~%s' % (args.course, item),
+        'partId': part,
         'executorId': grader_id,
     }
     update_result = requests.post(
@@ -286,8 +290,32 @@ def command_upload(args):
             update_result.text)
         return 1
     logging.info('Successfully updated assignment part %s to new executor %s',
-                 args.part, grader_id)
+                 part,
+                 grader_id)
     return 0
+
+
+def update_assignments(auth, grader_id, args):
+    item_and_parts = [[args.item, args.part]]
+    if args.additional_item_and_part is not None:
+        item_and_parts.extend(args.additional_item_and_part)
+    return_result = 0
+    for item_and_part in item_and_parts:
+        item = item_and_part[0]
+        part = item_and_part[1]
+        result = update_assignment(auth,
+                                   grader_id,
+                                   args,
+                                   item,
+                                   part)
+        if result != 0:
+            logging.error(
+                'Failed to update assignment part %s to new executor %s',
+                part,
+                grader_id)
+            return_result = 1
+
+    return return_result
 
 
 def parser(subparsers):
@@ -310,6 +338,13 @@ def parser(subparsers):
     parser_upload.add_argument(
         'part',
         help='The id of the part to associate the grader.')
+
+    parser_upload.add_argument(
+        '--additional_item_and_part',
+        nargs=2,
+        action='append',
+        help='The next two args specify an item ID and part ID which will '
+             'also be associated with the grader.')
 
     parser_upload.add_argument(
         '--temp-dir',
