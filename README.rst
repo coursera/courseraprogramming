@@ -9,7 +9,7 @@ teams author asynchronous graders for Coursera (typically programming
 assignments). Coursera's asynchronous grading environment is based upon
 `docker <https://www.docker.com/>`_. While use of this tool is by no means
 required to develop the docker container images, we believe it is helpful in the
-endavour. See below for brief descriptions of this tool's capabilities.
+endeavour. See below for brief descriptions of this tool's capabilities.
 
 Installation
 ------------
@@ -58,7 +58,7 @@ Examples:
 ls & cat
 ^^^^^^^^
 
-These subcommands help you veriy that a built docker container image actually
+These subcommands help you verify that a built docker container image actually
 has what you expect inside of it. You can use these commands to poke at the
 file system and verify that everything is where it should be.
 
@@ -95,7 +95,7 @@ This grade subcommand loosely replicates the production grading environment on
 your local machine, including applying CPU and memory limits, running as the
 correct user id, mounting the external file systems correctly, and relinquishing
 the appropriate extra linux capabilities. Note that because the GrID system has
-adoped a defense-in-depth or layered defensive posture, not all layers of the
+adopted a defense-in-depth or layered defensive posture, not all layers of the
 production environment can be faithfully replicated locally.
 
 The grade subcommand has 2 sub-sub-commands. ``local`` runs a local grader
