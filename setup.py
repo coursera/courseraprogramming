@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='courseraprogramming',
-      version='0.8.0',
+      version='0.9.0',
       description='A toolkit to help develop asynchronous graders for Coursera\
           based on docker images.',
       long_description=readme(),
