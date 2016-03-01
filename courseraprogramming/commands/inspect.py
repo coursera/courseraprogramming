@@ -43,6 +43,8 @@ def command_inspect(args):
     if not args.unlimited_memory:
         command_line.append('-m')
         command_line.append('1g')
+    if not args.no_rm:
+        command_line.append('--rm')
     if not args.super_user:
         # Note: docker run CLI doesn't support setting the group. :-(
         command_line.append('-u')
@@ -83,4 +85,8 @@ def parser(subparsers):
         '--super-user',
         action='store_true',
         help='Inspect as super-user. (Default: userid 1000.)')
+    parser_inspect.add_argument(
+        '--no-rm',
+        action='store_true',
+        help="Do not clean up the container from the file system after exit.")
     return parser_inspect

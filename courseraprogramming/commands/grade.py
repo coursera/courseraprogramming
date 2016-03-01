@@ -25,6 +25,7 @@ from courseraprogramming import utils
 import docker.utils
 import json
 import logging
+from requests.exceptions import ReadTimeout
 import sys
 
 
@@ -38,7 +39,19 @@ outside of Coursera's environment.
 def run_container(docker, container, args):
     "Runs the prepared container (and therefore grader), checking the output"
     docker.start(container)
-    exit_code = docker.wait(container, timeout=args.timeout)
+    try:
+        exit_code = docker.wait(container, timeout=args.timeout)
+    except ReadTimeout:
+        logging.error("The grader did not complete within the required "
+                      "timeout of %s seconds.", args.timeout)
+        logging.debug("About to terminate the container: %s" % container)
+        docker.kill(container)
+        logging.debug("Successfully killed the container.")
+        if not args.no_rm:
+            logging.debug("Removing container...")
+            docker.remove_container(container)
+            logging.debug("Successfully cleaned up the container.")
+        sys.exit(1)
     if exit_code != 0:
         logging.warn("The grade command did not exit cleanly within the "
                      "container. Exit code: %s", exit_code)
@@ -92,6 +105,9 @@ def run_container(docker, container, args):
             sys.stdout.write(stdout_output)
             sys.stdout.write('=' * 80)
             sys.stdout.write('\n')
+        if not args.no_rm:
+            logging.debug("About to remove container: %s", container)
+            docker.remove_container(container)
     if exit_code != 0 or error_in_grader_output:
         sys.exit(1)
 
@@ -168,6 +184,10 @@ def parser(subparsers):
         parents=[common_flags, common.container_parser()])
 
     parser_grade_local.set_defaults(func=command_grade_local)
+    parser_grade_local.add_argument(
+        '--no-rm',
+        action='store_true',
+        help='Do not clean up the container after grading completes.')
     parser_grade_local.add_argument(
         'dir',
         help='Directory containing the submission.',
