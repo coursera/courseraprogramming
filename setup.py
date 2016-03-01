@@ -7,12 +7,12 @@ def readme():
 
 
 setup(name='courseraprogramming',
-      version='0.9.0',
+      version='0.10.0',
       description='A toolkit to help develop asynchronous graders for Coursera\
           based on docker images.',
       long_description=readme(),
       classifiers=[
-          'Development Status :: 3 - Alpha',
+          'Development Status :: 5 - Production/Stable',
           'License :: OSI Approved :: Apache Software License',
           'Programming Language :: Python :: 2.7',
       ],

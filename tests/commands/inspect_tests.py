@@ -25,6 +25,7 @@ def test_inspect_parsing():
     args = parser.parse_args('inspect demo/primes'.split())
     assert args.func == inspect.command_inspect
     assert args.containerId == 'demo/primes'
+    assert not args.no_rm
 
 
 @patch('courseraprogramming.commands.inspect.os')
@@ -37,6 +38,7 @@ def test_ls_run(os):
     args.allow_network = False
     args.unlimited_memory = False
     args.super_user = False
+    args.no_rm = False
 
     # Run the command
     inspect.command_inspect(args)
@@ -52,6 +54,7 @@ def test_ls_run(os):
         'none',
         '-m',
         '1g',
+        '--rm',
         '-u',
         '1000',
         'testContainerId',
@@ -68,6 +71,7 @@ def test_ls_run_without_limits(os):
     args.allow_network = True
     args.unlimited_memory = True
     args.super_user = True
+    args.no_rm = True
 
     # Run the command
     inspect.command_inspect(args)

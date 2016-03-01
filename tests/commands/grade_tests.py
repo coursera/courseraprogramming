@@ -30,16 +30,18 @@ def test_grade_local_parsing():
     assert args.func == grade.command_grade_local
     assert args.containerId == 'myContainerId'
     assert args.dir == '/tmp'
+    assert not args.no_rm
 
 
 def test_grade_local_parsing_with_extra_args():
     parser = main.build_parser()
     args = parser.parse_args(
-        'grade local myContainerId /tmp arg1 arg2'.split())
+        'grade local --no-rm myContainerId /tmp arg1 arg2'.split())
     assert args.func == grade.command_grade_local
     assert args.containerId == 'myContainerId'
     assert args.dir == '/tmp'
     assert args.args == ['arg1', 'arg2']
+    assert args.no_rm
 
 
 @patch('courseraprogramming.commands.grade.sys')
@@ -51,6 +53,7 @@ def test_check_output_bad_isCorrect(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -61,7 +64,8 @@ def test_check_output_bad_isCorrect(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "Field 'isCorrect' is not a boolean value.")
+        ('root', 'ERROR', "Field 'isCorrect' is not a boolean value."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -75,6 +79,7 @@ def test_check_output_no_feedback(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -85,7 +90,8 @@ def test_check_output_no_feedback(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "Field 'feedback' not present in parsed output.")
+        ('root', 'ERROR', "Field 'feedback' not present in parsed output."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -99,6 +105,7 @@ def test_check_output_fractional_score_boolean(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -109,7 +116,8 @@ def test_check_output_fractional_score_boolean(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "Field 'fractionalScore' must be a decimal.")
+        ('root', 'ERROR', "Field 'fractionalScore' must be a decimal."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -123,6 +131,7 @@ def test_check_output_fractional_score_string(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -133,7 +142,8 @@ def test_check_output_fractional_score_string(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "Field 'fractionalScore' must be a decimal.")
+        ('root', 'ERROR', "Field 'fractionalScore' must be a decimal."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -147,6 +157,7 @@ def test_check_output_fractional_score_too_high(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -157,7 +168,8 @@ def test_check_output_fractional_score_too_high(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "Field 'fractionalScore' must be <= 1.")
+        ('root', 'ERROR', "Field 'fractionalScore' must be <= 1."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -171,6 +183,7 @@ def test_check_output_fractional_score_too_low(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -181,7 +194,8 @@ def test_check_output_fractional_score_too_low(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "Field 'fractionalScore' must be >= 0.")
+        ('root', 'ERROR', "Field 'fractionalScore' must be >= 0."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -195,6 +209,7 @@ def test_check_output_missing_grade(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -205,7 +220,8 @@ def test_check_output_missing_grade(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "Required field 'fractionalScore' is missing.")
+        ('root', 'ERROR', "Required field 'fractionalScore' is missing."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -219,6 +235,7 @@ def test_check_output_malformed_output(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -229,7 +246,8 @@ def test_check_output_malformed_output(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'ERROR', "The output was not a valid JSON document.")
+        ('root', 'ERROR', "The output was not a valid JSON document."),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -243,6 +261,7 @@ def test_check_output_bad_return_code(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 1
         docker_mock.logs.side_effect = [
@@ -263,6 +282,7 @@ def test_check_output_good_output_is_correct(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -273,6 +293,7 @@ def test_check_output_good_output_is_correct(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -286,6 +307,7 @@ def test_check_output_good_output_fractional_score(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -296,6 +318,7 @@ def test_check_output_good_output_fractional_score(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -309,6 +332,7 @@ def test_check_output_good_output_fractional_score_one(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -319,6 +343,7 @@ def test_check_output_good_output_fractional_score_one(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -332,6 +357,7 @@ def test_check_output_good_output_fractional_score_one_point_oh(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -342,6 +368,7 @@ def test_check_output_good_output_fractional_score_one_point_oh(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -355,6 +382,7 @@ def test_check_output_good_output_fractional_score_zero(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -365,6 +393,7 @@ def test_check_output_good_output_fractional_score_zero(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -378,6 +407,7 @@ def test_check_output_good_output_fractional_score_zero_point_oh(sys):
         }
         args = argparse.Namespace()
         args.timeout = 300
+        args.no_rm = False
 
         docker_mock.wait.return_value = 0
         docker_mock.logs.side_effect = [
@@ -388,6 +418,7 @@ def test_check_output_good_output_fractional_score_zero_point_oh(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 

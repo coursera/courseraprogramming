@@ -91,6 +91,8 @@ def main():
     # Dispatch into the appropriate subcommand function.
     try:
         return args.func(args)
+    except SystemExit:
+        pass
     except:
         logging.exception('Problem when running command. Sorry!')
         sys.exit(1)
