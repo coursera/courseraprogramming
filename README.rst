@@ -107,7 +107,7 @@ handle problematic submissions.
 
 Examples:
  - ``courseraprogramming grade local $MY_CONTAINER_IMAGE
-   /path/to/sample/submission``
+   /path/to/sample/submission/``
    invokes the grader passing in the sample submission into the grader.
  - ``courseraprogramming grade local --help`` displays the full list of
    flags and options available.
