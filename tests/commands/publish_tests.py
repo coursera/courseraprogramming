@@ -25,6 +25,7 @@ class PublishParams:
     publish_action = "fake-action"
     course = "2345"
     item = "3456"
+    quiet = 1
 
 
 def fake_get_metadata(oauth, get_endpoint, course_id, item_id):

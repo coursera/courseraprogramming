@@ -61,14 +61,24 @@ class InternalError(Exception):
     pass
 
 
+def write_std_out(string, args):
+    if args.quiet <= 0:
+        sys.stdout.write(string)
+        sys.stdout.flush()
+
+
 def command_publish(args):
     oauth2_instance = oauth2.build_oauth2(args)
     course_id = args.course
     item_ids = [args.item] + getattr(args, 'additional_items', [])
     for item_id in item_ids:
+        write_std_out("Starting publish for item {} in course {}.\n".format(
+            item_id, course_id), args)
         try:
+            write_std_out("Fetching requied metadata...\n", args)
             metadata = get_metadata(
                 oauth2_instance, args.get_endpoint, course_id, item_id)
+            write_std_out("Publishing...\n", args)
             post_publish(
                 oauth2_instance,
                 args.publish_endpoint,
@@ -76,18 +86,51 @@ def command_publish(args):
                 course_id,
                 item_id,
                 metadata)
+            write_std_out("Publish complete for item {} in course {}\n".format(
+                item_id, course_id), args)
         except ItemNotFoundError as e:
+            logging.error(
+                "Unable to find a publishable assignment with item "
+                "id {}. Maybe there are no changes to publish?".format(
+                    item_id, course_id))
             sys.exit(ErrorCodes.FATAL_ERROR)
         except ValidationError as e:
+            logging.error(
+                "We found some validation errors in your assignment with item "
+                "id {}. Please verify that your assignment is formatted "
+                "correctly and try again.".format(
+                    item_id))
             sys.exit(ErrorCodes.FATAL_ERROR)
         except GraderExecutorError as e:
             if e.status == GraderExecutorStatus.PENDING:
+                logging.warn(
+                    "We are still processing your grader for your assignment "
+                    "with item id {}.  Please try again soon.".format(
+                        item_id))
                 sys.exit(ErrorCodes.RETRYABLE_ERROR)
             elif e.status == GraderExecutorStatus.FAILED:
+                logging.error(
+                    "We were unable to process your grader for your "
+                    "assignment with item id {}.  Please try to upload your "
+                    "grader again. If the problem persists, please let us "
+                    "know.".format(
+                        item_id))
                 sys.exit(ErrorCodes.FATAL_ERROR)
             elif e.status == GraderExecutorStatus.MISSING:
+                logging.error(
+                    "We were unable to find your grader for your assignment "
+                    "with item id {}.  Please try to upload your grader "
+                    "again. If the problem persists, please let us "
+                    "know.".format(
+                        item_id))
                 sys.exit(ErrorCodes.FATAL_ERROR)
         except InternalError as e:
+            logging.error(
+                "Something unexpected happened while trying to publish your "
+                "assignment with item id {}. Please verify your course and "
+                "item ids are correct.  If the problem persists, please let "
+                "us know.".format(
+                    item_id))
             sys.exit(ErrorCodes.FATAL_ERROR)
 
 
@@ -96,7 +139,6 @@ def get_metadata(oauth2_instance, get_endpoint, course_id, item_id):
     resp = requests.get(
         '{}/{}~{}'.format(get_endpoint, course_id, item_id),
         auth=auth)
-    print resp.status_code
     if resp.status_code == 404:
         raise ItemNotFoundError(course_id, item_id)
     elif resp.status_code == 500:
@@ -119,7 +161,6 @@ def post_publish(
     }
     resp = requests.post(
         publish_endpoint, params=params, json=metadata, auth=auth)
-    print resp.status_code
     if resp.status_code == 400:
         status = get_executor_status(resp.json())
         if status is None:
