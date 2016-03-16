@@ -9,6 +9,7 @@ __all__ = [
     "sanity",
     "upload",
     "version",
+    "publish",
 ]
 
 from . import *  # noqa

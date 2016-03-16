@@ -79,6 +79,9 @@ def build_parser():
     # create the parser for the upload command.
     commands.upload.parser(subparsers)
 
+    # create the parser for the publish command.
+    commands.publish.parser(subparsers)
+
     return parser
 
 
