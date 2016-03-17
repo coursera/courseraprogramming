@@ -62,24 +62,18 @@ class InternalError(Exception):
     pass
 
 
-def write_std_out(string, args):
-    if args.quiet <= 0:
-        sys.stdout.write(string)
-        sys.stdout.flush()
-
-
 def command_publish(args):
     oauth2_instance = oauth2.build_oauth2(args)
     course_id = args.course
     item_ids = [args.item] + (getattr(args, 'additional_items') or [])
     for item_id in item_ids:
-        write_std_out("Starting publish for item {} in course {}.\n".format(
-            item_id, course_id), args)
+        logging.info("Starting publish for item {} in course {}".format(
+            item_id, course_id))
         try:
-            write_std_out("Fetching requied metadata...\n", args)
+            logging.info("Fetching requied metadata...")
             metadata = get_metadata(
                 oauth2_instance, args.get_endpoint, course_id, item_id)
-            write_std_out("Publishing...\n", args)
+            logging.info("Publishing...")
             publish_item(
                 oauth2_instance,
                 args.publish_endpoint,
@@ -87,8 +81,8 @@ def command_publish(args):
                 course_id,
                 item_id,
                 metadata)
-            write_std_out("Publish complete for item {} in course {}\n".format(
-                item_id, course_id), args)
+            logging.info("Publish complete for item {} in course {}".format(
+                item_id, course_id))
         except ItemNotFoundError as e:
             logging.error(
                 "Unable to find a publishable assignment with item "
