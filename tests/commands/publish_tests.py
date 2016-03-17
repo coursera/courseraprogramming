@@ -30,6 +30,10 @@ class PublishParams:
     course = "2345"
     item = "3456"
     quiet = 1
+    additional_items = None
+    config = None
+    docker_url = None
+    verbose = None
 
 
 def fake_get_metadata(oauth, get_endpoint, course_id, item_id):
@@ -68,6 +72,7 @@ def test_multiple_items():
 
     PublishParams.additional_items = ['4567', '5678']
     publish.command_publish(PublishParams)
+    PublishParams.additional_items = None
 
     publish.publish_item.assert_has_calls([
         call(

@@ -71,7 +71,7 @@ def write_std_out(string, args):
 def command_publish(args):
     oauth2_instance = oauth2.build_oauth2(args)
     course_id = args.course
-    item_ids = [args.item] + getattr(args, 'additional_items', [])
+    item_ids = [args.item] + (getattr(args, 'additional_items') or [])
     for item_id in item_ids:
         write_std_out("Starting publish for item {} in course {}.\n".format(
             item_id, course_id), args)
