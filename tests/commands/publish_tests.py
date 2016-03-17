@@ -43,11 +43,11 @@ def fake_get_metadata(oauth, get_endpoint, course_id, item_id):
 
 def test_called_with_metadata():
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = MagicMock()
+    publish.publish_item = MagicMock()
 
     publish.command_publish(PublishParams)
 
-    publish.post_publish.assert_called_with(
+    publish.publish_item.assert_called_with(
         ANY,
         "fake-endpoint",
         "fake-action",
@@ -64,12 +64,12 @@ def test_called_with_metadata():
 
 def test_multiple_items():
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = MagicMock()
+    publish.publish_item = MagicMock()
 
     PublishParams.additional_items = ['4567', '5678']
     publish.command_publish(PublishParams)
 
-    publish.post_publish.assert_has_calls([
+    publish.publish_item.assert_has_calls([
         call(
             ANY,
             "fake-endpoint",
@@ -139,11 +139,11 @@ def test_internal_error_metadata(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_failed_validation(sys):
-    def fake_post_publish(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
         raise publish.ValidationError()
 
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = fake_post_publish
+    publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
 
@@ -152,12 +152,12 @@ def test_failed_validation(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_pending_executor(sys):
-    def fake_post_publish(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
         raise publish.GraderExecutorError(
             status=publish.GraderExecutorStatus.PENDING)
 
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = fake_post_publish
+    publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
 
@@ -166,12 +166,12 @@ def test_pending_executor(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_failed_executor(sys):
-    def fake_post_publish(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
         raise publish.GraderExecutorError(
             status=publish.GraderExecutorStatus.FAILED)
 
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = fake_post_publish
+    publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
     sys.exit.assert_called_with(publish.ErrorCodes.FATAL_ERROR)
@@ -179,12 +179,12 @@ def test_failed_executor(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_missing_executor(sys):
-    def fake_post_publish(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
         raise publish.GraderExecutorError(
             status=publish.GraderExecutorStatus.MISSING)
 
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = fake_post_publish
+    publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
     sys.exit.assert_called_with(publish.ErrorCodes.FATAL_ERROR)
@@ -192,11 +192,11 @@ def test_missing_executor(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_internal_error_publish(sys):
-    def fake_post_publish(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
         raise publish.InternalError()
 
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = fake_post_publish
+    publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
 
@@ -205,12 +205,12 @@ def test_internal_error_publish(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_item_not_found_publish(sys):
-    def fake_post_publish(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
         raise publish.ItemNotFoundError(
             PublishParams.course, PublishParams.item)
 
     publish.get_metadata = fake_get_metadata
-    publish.post_publish = fake_post_publish
+    publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
 

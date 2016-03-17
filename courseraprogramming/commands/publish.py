@@ -80,7 +80,7 @@ def command_publish(args):
             metadata = get_metadata(
                 oauth2_instance, args.get_endpoint, course_id, item_id)
             write_std_out("Publishing...\n", args)
-            post_publish(
+            publish_item(
                 oauth2_instance,
                 args.publish_endpoint,
                 args.publish_action,
@@ -147,7 +147,7 @@ def get_metadata(oauth2_instance, get_endpoint, course_id, item_id):
     return resp.json()['elements'][0]['metadata']
 
 
-def post_publish(
+def publish_item(
         oauth2_instance,
         publish_endpoint,
         publish_action,
