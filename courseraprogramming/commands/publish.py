@@ -28,12 +28,13 @@ from courseraprogramming.commands import common
 from courseraprogramming.commands import oauth2
 
 
-class ErrorCodes():
+# Program exit codes to indicate what to do next
+class ErrorCodes:
     FATAL_ERROR = 1
     RETRYABLE_ERROR = 2
 
 
-class GraderExecutorStatus():
+class GraderExecutorStatus:
     COMPLETED = "COMPLETED"
     PENDING = "PENDING"
     FAILED = "FAILED"

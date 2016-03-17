@@ -17,7 +17,10 @@
 from courseraprogramming import main
 from courseraprogramming.commands import publish
 
-from mock import ANY, call, MagicMock, patch
+from mock import ANY
+from mock import call
+from mock import MagicMock
+from mock import patch
 
 
 class PublishParams:
