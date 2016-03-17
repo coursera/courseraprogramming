@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from courseraprogramming import main
 from courseraprogramming.commands import publish
 
 from mock import ANY, call, MagicMock, patch
@@ -293,3 +294,19 @@ def test_get_executor_status_none():
     expected = None
 
     assert actual == expected
+
+
+def test_publish_parsing():
+    parser = main.build_parser()
+    args = parser.parse_args('publish COURSE_ID ITEM_ID'.split())
+    assert args.course == 'COURSE_ID'
+    assert args.item == 'ITEM_ID'
+    assert args.additional_items is None
+
+
+def test_upload_parsing_with_additional_items():
+    parser = main.build_parser()
+    args = parser.parse_args('publish COURSE_ID ITEM_ID'.split() +
+                             '--additional_items ITEM_2 ITEM_3 ITEM_4'.split())
+    print args.additional_items
+    assert args.additional_items == ['ITEM_2', 'ITEM_3', 'ITEM_4']
