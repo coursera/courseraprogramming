@@ -120,6 +120,10 @@ def docker_client(args):
     elif _platform == 'darwin':
         # OS X - Assume boot2docker, and pull from that environment.
         kwargs = kwargs_from_env()
+        if len(kwargs) == 0:
+            logging.error('Could not correctly pull in docker environment. '
+                          'Try running: eval "$(docker-machine env default)"')
+            sys.exit(2)
         if not args.strict_docker_tls:
             kwargs['tls'].assert_hostname = False
 
