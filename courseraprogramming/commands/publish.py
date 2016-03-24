@@ -194,7 +194,7 @@ def parser(subparsers):
 
     parser_publish.add_argument(
         '--additional_items',
-        nargs='*',
+        nargs='+',
         help='The next two args specify an item ID which will also be '
              'published.')
 
