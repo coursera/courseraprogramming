@@ -133,6 +133,24 @@ Examples:
  - ``courseraprogramming upload --help`` displays all available options
    for the :code:`upload` subcommand.
 
+publish
+^^^^^^^
+
+Allows an instructional team to publish changes made to programming
+assignments. Beware that *all* changes made to your assignment will be
+published, not just grader changes.  Like ``upload``, it is designed to work in
+an unattended fashion. Multiple items can be published at the same time using
+the ``--additional-items`` flag. There are multiple different error conditions
+that are represented by exit codes. An exit code of 1 represents a fatal error
+while an exit code of 2 represents a retryable error.
+
+Examples:
+ - ``courseraprogramming publish $COURSE_ID $ITEM_ID`` publishes the item
+   with item id $ITEM_ID in the course $COURSE_ID
+ - ``courseraprogramming publish $COURSE_ID $ITEM_ID_1 --additional-items
+   $ITEM_ID_2 $ITEM_ID_3`` publishes the items with ids $ITEM_ID_1, $ITEM_ID_2
+   and $ITEM_ID_3 in the course $COURSE_ID
+
 Bugs / Issues / Feature Requests
 --------------------------------
 

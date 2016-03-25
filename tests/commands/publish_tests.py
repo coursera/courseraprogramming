@@ -315,6 +315,6 @@ def test_publish_parsing():
 def test_upload_parsing_with_additional_items():
     parser = main.build_parser()
     args = parser.parse_args('publish COURSE_ID ITEM_ID'.split() +
-                             '--additional_items ITEM_2 ITEM_3 ITEM_4'.split())
+                             '--additional-items ITEM_2 ITEM_3 ITEM_4'.split())
     print args.additional_items
     assert args.additional_items == ['ITEM_2', 'ITEM_3', 'ITEM_4']
