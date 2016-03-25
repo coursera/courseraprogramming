@@ -6,6 +6,7 @@ __all__ = [
     "grade",
     "inspect",
     "ls",
+    "publish",
     "sanity",
     "upload",
     "version",
