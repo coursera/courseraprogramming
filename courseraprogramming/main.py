@@ -92,7 +92,7 @@ def main():
     try:
         return args.func(args)
     except SystemExit:
-        pass
+        raise
     except:
         logging.exception('Problem when running command. Sorry!')
         sys.exit(1)
