@@ -359,15 +359,17 @@ def parser(subparsers):
         '--grader-cpu',
         type=int,
         choices=[1, 2],
-        help='Amount of CPU your grader is allocated. You may choose from 1 '
-             'or 2 full CPU cores. The default number is 1.')
+        help='Amount of CPU your grader is allocated when grading '
+             'submissions. You may choose from 1 or 2 full CPU cores. The '
+             'default number is 1.')
 
     parser_upload.add_argument(
         '--grader-memory-limit',
         type=int,
         choices=[1024, 2048],
-        help='Amount of memory your grader is allocated. You may choose from '
-             '1024 MB or 2048 MB. The default amount is 1024 MB.')
+        help='Amount of memory your grader is allocated when grading '
+             'submissions. You may choose from 1024 MB or 2048 MB. The '
+             'default amount is 1024 MB.')
 
     parser_upload.add_argument(
         '--grading-timeout',
