@@ -42,3 +42,16 @@ def test_upload_parsing_with_additional_items():
                              .split())
     assert args.additional_item_and_part == [['ITEM_2', 'PART_2'],
                                              ['ITEM_3', 'PART_3']]
+
+
+def test_upload_parsing_with_resource_customization():
+    parser = main.build_parser()
+    args = parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+                             '--grader-cpu 1 '
+                             '--grader-memory-limit 1024 '
+                             '--grading-timeout 300 '
+                             .split())
+    print(args)
+    assert args.grader_cpu == 1
+    assert args.grader_memory_limit == 1024
+    assert args.grading_timeout == 300

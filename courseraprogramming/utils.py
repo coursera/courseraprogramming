@@ -132,3 +132,17 @@ def docker_client(args):
         # Windows.
         logging.fatal("Sorry, windows is not currently supported!")
         sys.exit(2)
+
+
+def check_int_range(value, lower=None, upper=None):
+    try:
+        value = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError('{} is not an integer'.format(value))
+    if lower is not None and value < lower:
+        raise argparse.ArgumentTypeError(
+            '{} is below the lower bound of {}'.format(value, lower))
+    if upper is not None and value > upper:
+        raise argparse.ArgumentTypeError(
+            '{} is above the upper bound of {}'.format(value, upper))
+    return value

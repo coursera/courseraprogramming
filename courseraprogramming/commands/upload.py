@@ -241,6 +241,10 @@ def command_upload(args):
         'courseId': args.course,
         'bucket': upload_information[0],
         'key': upload_information[1],
+        'reservedCpu':
+            args.grader_cpu * 1024 if hasattr(args, 'grader_cpu') else None,
+        'reservedMemory': getattr(args, 'grader_memory_limit', None),
+        'wallClockTimeout': getattr(args, 'grading_timeout', None),
     }
     logging.debug('About to POST data to register endpoint: %s',
                   json.dumps(register_request))
@@ -320,6 +324,11 @@ def update_assignments(auth, grader_id, args):
 
 def parser(subparsers):
     "Build an argparse argument parser to parse the command line."
+
+    # constants for timeout ranges
+    TIMEOUT_LOWER = 300
+    TIMEOUT_UPPER = 1800
+
     # create the parser for the upload command.
     parser_upload = subparsers.add_parser(
         'upload',
@@ -345,6 +354,27 @@ def parser(subparsers):
         action='append',
         help='The next two args specify an item ID and part ID which will '
              'also be associated with the grader.')
+
+    parser_upload.add_argument(
+        '--grader-cpu',
+        type=int,
+        choices=[1, 2],
+        help='Amount of CPU your grader is allocated. You may choose from 1 '
+             'or 2 full CPU cores. The default number is 1.')
+
+    parser_upload.add_argument(
+        '--grader-memory-limit',
+        type=int,
+        choices=[1024, 2048],
+        help='Amount of memory your grader is allocated. You may choose from '
+             '1024 MB or 2048 MB. The default amount is 1024 MB.')
+
+    parser_upload.add_argument(
+        '--grading-timeout',
+        type=lambda v: utils.check_int_range(v, TIMEOUT_LOWER, TIMEOUT_UPPER),
+        help='Amount of time allowed before your grader times out, in '
+             'seconds. You may choose any value between 300 seconds and 1800 '
+             'seconds.  The default time is 1200 seconds (20 minutes).')
 
     parser_upload.add_argument(
         '--temp-dir',
