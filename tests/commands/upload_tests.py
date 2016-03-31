@@ -20,6 +20,7 @@ from courseraprogramming import main
 from courseraprogramming.commands import grade
 from mock import MagicMock
 from mock import patch
+from nose.tools import nottest
 from testfixtures import LogCapture
 
 
@@ -42,3 +43,75 @@ def test_upload_parsing_with_additional_items():
                              .split())
     assert args.additional_item_and_part == [['ITEM_2', 'PART_2'],
                                              ['ITEM_3', 'PART_3']]
+
+
+def test_upload_parsing_with_resource_customization():
+    parser = main.build_parser()
+    args = parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+                             '--grader-cpu 1 '
+                             '--grader-memory-limit 1024 '
+                             '--grading-timeout 300 '
+                             .split())
+    assert args.grader_cpu == 1
+    assert args.grader_memory_limit == 1024
+    assert args.grading_timeout == 300
+
+
+@nottest
+def test_upload_parsing_invalid_cpu():
+    parser = main.build_parser()
+    try:
+        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+                          '--grader-cpu 3 '
+                          '--grader-memory-limit 1024 '
+                          '--grading-timeout 300 '
+                          .split())
+    except SystemExit:
+        assert True
+    else:
+        assert False, 'parser should have thrown exception'
+
+
+@nottest
+def test_upload_parsing_invalid_memory():
+    parser = main.build_parser()
+    try:
+        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+                          '--grader-cpu 1 '
+                          '--grader-memory-limit 3 '
+                          '--grading-timeout 300 '
+                          .split())
+    except SystemExit:
+        assert True
+    else:
+        assert False, 'parser should have thrown exception'
+
+
+@nottest
+def test_upload_parsing_timeout_too_low():
+    parser = main.build_parser()
+    try:
+        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+                          '--grader-cpu 1 '
+                          '--grader-memory-limit 1024 '
+                          '--grading-timeout 299 '
+                          .split())
+    except SystemExit:
+        assert True
+    else:
+        assert False, 'parser should have thrown exception'
+
+
+@nottest
+def test_upload_parsing_timeout_too_high():
+    parser = main.build_parser()
+    try:
+        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+                          '--grader-cpu 1 '
+                          '--grader-memory-limit 1024 '
+                          '--grading-timeout 1801 '
+                          .split())
+    except SystemExit:
+        assert True
+    else:
+        assert False, 'parser should have thrown exception'
