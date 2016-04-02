@@ -237,12 +237,15 @@ def command_upload(args):
 
     # Rebuild an authorizer to ensure it's fresh and not expired
     auth = oauth2_instance.build_authorizer()
+
+    grader_cpu = None
+    if hasattr(args, 'grader_cpu') and args.grader_cpu is not None:
+        grader_cpu = args.grader_cpu * 1024
     register_request = {
         'courseId': args.course,
         'bucket': upload_information[0],
         'key': upload_information[1],
-        'reservedCpu':
-            args.grader_cpu * 1024 if hasattr(args, 'grader_cpu') else None,
+        'reservedCpu': grader_cpu,
         'reservedMemory': getattr(args, 'grader_memory_limit', None),
         'wallClockTimeout': getattr(args, 'grading_timeout', None),
     }
