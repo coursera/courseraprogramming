@@ -132,7 +132,7 @@ def command_grade_local(args):
         if 'args' in args and len(args.args) > 0:
             # Handle additional command-line arguments which will
             # be passed to the grader.
-            inspect = d.inspect_image(image=args.containerId)
+            inspect = d.inspect_image(image=args.imageId)
             cmd = inspect['Config']['Entrypoint']
             if not type(cmd) is list:
                 logging.error('ENTRYPOINT in Dockerfile must be a list in ' +
@@ -140,14 +140,14 @@ def command_grade_local(args):
                 raise
             cmd.extend(args.args)
             container = d.create_container(
-                image=args.containerId,
+                image=args.imageId,
                 entrypoint=cmd,
                 user=user,
                 host_config=host_config,
             )
         else:
             container = d.create_container(
-                image=args.containerId,
+                image=args.imageId,
                 user=user,
                 host_config=host_config,
             )

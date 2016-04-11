@@ -26,9 +26,9 @@ from testfixtures import LogCapture
 def test_grade_local_parsing():
     # TODO: mock out `os.path.isdir` to make this test more portable.
     parser = main.build_parser()
-    args = parser.parse_args('grade local myContainerId /tmp'.split())
+    args = parser.parse_args('grade local myimageId /tmp'.split())
     assert args.func == grade.command_grade_local
-    assert args.containerId == 'myContainerId'
+    assert args.imageId == 'myimageId'
     assert args.dir == '/tmp'
     assert not args.no_rm
 
@@ -36,9 +36,9 @@ def test_grade_local_parsing():
 def test_grade_local_parsing_with_extra_args():
     parser = main.build_parser()
     args = parser.parse_args(
-        'grade local --no-rm myContainerId /tmp arg1 arg2'.split())
+        'grade local --no-rm myimageId /tmp arg1 arg2'.split())
     assert args.func == grade.command_grade_local
-    assert args.containerId == 'myContainerId'
+    assert args.imageId == 'myimageId'
     assert args.dir == '/tmp'
     assert args.args == ['arg1', 'arg2']
     assert args.no_rm
@@ -49,7 +49,7 @@ def test_check_output_bad_isCorrect(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -65,7 +65,7 @@ def test_check_output_bad_isCorrect(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "Field 'isCorrect' is not a boolean value."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -75,7 +75,7 @@ def test_check_output_no_feedback(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -91,7 +91,7 @@ def test_check_output_no_feedback(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "Field 'feedback' not present in parsed output."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -101,7 +101,7 @@ def test_check_output_fractional_score_boolean(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -117,7 +117,7 @@ def test_check_output_fractional_score_boolean(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "Field 'fractionalScore' must be a decimal."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -127,7 +127,7 @@ def test_check_output_fractional_score_string(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -143,7 +143,7 @@ def test_check_output_fractional_score_string(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "Field 'fractionalScore' must be a decimal."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -153,7 +153,7 @@ def test_check_output_fractional_score_too_high(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -169,7 +169,7 @@ def test_check_output_fractional_score_too_high(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "Field 'fractionalScore' must be <= 1."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -179,7 +179,7 @@ def test_check_output_fractional_score_too_low(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -195,7 +195,7 @@ def test_check_output_fractional_score_too_low(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "Field 'fractionalScore' must be >= 0."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -205,7 +205,7 @@ def test_check_output_missing_grade(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -221,7 +221,7 @@ def test_check_output_missing_grade(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "Required field 'fractionalScore' is missing."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -231,7 +231,7 @@ def test_check_output_malformed_output(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -247,7 +247,7 @@ def test_check_output_malformed_output(sys):
     logs.check(
         ('root', 'INFO', 'Debug log:'),
         ('root', 'ERROR', "The output was not a valid JSON document."),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     sys.exit.assert_called_with(1)
 
@@ -257,7 +257,7 @@ def test_check_output_bad_return_code(sys):
     with LogCapture():
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -278,7 +278,7 @@ def test_check_output_good_output_is_correct(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -293,7 +293,7 @@ def test_check_output_good_output_is_correct(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -303,7 +303,7 @@ def test_check_output_good_output_fractional_score(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -318,7 +318,7 @@ def test_check_output_good_output_fractional_score(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -328,7 +328,7 @@ def test_check_output_good_output_fractional_score_one(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -343,7 +343,7 @@ def test_check_output_good_output_fractional_score_one(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -353,7 +353,7 @@ def test_check_output_good_output_fractional_score_one_point_oh(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -368,7 +368,7 @@ def test_check_output_good_output_fractional_score_one_point_oh(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -378,7 +378,7 @@ def test_check_output_good_output_fractional_score_zero(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -393,7 +393,7 @@ def test_check_output_good_output_fractional_score_zero(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -403,7 +403,7 @@ def test_check_output_good_output_fractional_score_zero_point_oh(sys):
     with LogCapture() as logs:
         docker_mock = MagicMock()
         container = {
-            "Id": "myContainerId"
+            "Id": "myimageId"
         }
         args = argparse.Namespace()
         args.timeout = 300
@@ -418,7 +418,7 @@ def test_check_output_good_output_fractional_score_zero_point_oh(sys):
         grade.run_container(docker_mock, container, args)
     logs.check(
         ('root', 'INFO', 'Debug log:'),
-        ('root', 'DEBUG', "About to remove container: {'Id': 'myContainerId'}")
+        ('root', 'DEBUG', "About to remove container: {'Id': 'myimageId'}")
     )
     assert not sys.exit.called, "sys.exit should not be called!"
 
@@ -434,7 +434,7 @@ def test_command_local_grade_simple(
         common):
     args = argparse.Namespace()
     args.dir = '/tmp'
-    args.containerId = 'myContainerId'
+    args.imageId = 'myimageId'
 
     common.mk_submission_volume_str.return_value = 'foo'
     docker_mock = MagicMock()
@@ -455,7 +455,7 @@ def test_command_local_grade_simple(
         memswap_limit='1g',
     )
     docker_mock.create_container.assert_called_with(
-        image='myContainerId',
+        image='myimageId',
         user='1000',
         host_config=h_config,
     )
@@ -471,7 +471,7 @@ def test_command_local_grade_simple(
 def test_command_local_grade_with_extra_args(run_container, utils, common):
     args = argparse.Namespace()
     args.dir = '/tmp'
-    args.containerId = 'myContainerId'
+    args.imageId = 'myimageId'
     args.args = ['extra', 'args']
     common.mk_submission_volume_str.return_value = 'foo'
     docker_mock = MagicMock()
@@ -488,7 +488,7 @@ def test_command_local_grade_with_extra_args(run_container, utils, common):
     grade.command_grade_local(args)
 
     docker_mock.create_container.assert_called_with(
-        image='myContainerId',
+        image='myimageId',
         entrypoint=['command', 'extra', 'args'],
         user='1000',
         host_config=docker.utils.create_host_config(
