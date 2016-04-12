@@ -51,3 +51,15 @@ def test_set_logging_level_noneSpecified():
     utils.set_logging_level(args)
     assert logging.getLogger().getEffectiveLevel() == logging.INFO or \
         logging.getLogger().getEffectiveLevel() == logging.NOTSET
+
+
+def test_set_timeout():
+    parser = main.build_parser()
+    args = parser.parse_args('--timeout 120 version'.split())
+    assert args.timeout == 120
+
+
+def test_no_timeout():
+    parser = main.build_parser()
+    args = parser.parse_args('version'.split())
+    assert args.timeout == 60

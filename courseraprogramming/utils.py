@@ -100,6 +100,11 @@ def docker_client_arg_parser():
         action='store_true',
         help='Do not disable strict tls checks for the docker client (mac \
             os x only).')
+    docker_parser.add_argument(
+        '--timeout',
+        type=int,
+        default=60,
+        help='Set the default timeout when interacting with the docker demon')
     return docker_parser
 
 
@@ -113,10 +118,10 @@ def docker_client(args):
     if _platform == 'linux' or _platform == 'linux2':
         # linux
         if "docker_url" in args:
-            return Client(base_url=args.docker_url)
+            return Client(base_url=args.docker_url, timeout=args.timeout)
         else:
             # TODO: test to see if this does the right thing by default.
-            return Client(**kwargs_from_env())
+            return Client(timeout=args.timeout, **kwargs_from_env())
     elif _platform == 'darwin':
         # OS X - Assume boot2docker, and pull from that environment.
         kwargs = kwargs_from_env()
@@ -127,7 +132,7 @@ def docker_client(args):
         if not args.strict_docker_tls:
             kwargs['tls'].assert_hostname = False
 
-        return Client(**kwargs)
+        return Client(timeout=args.timeout, **kwargs)
     elif _platform == 'win32' or _platform == 'cygwin':
         # Windows.
         logging.fatal("Sorry, windows is not currently supported!")
