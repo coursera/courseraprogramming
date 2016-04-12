@@ -31,7 +31,7 @@ def command_cat(args):
     d = utils.docker_client(args)
     try:
         container = d.create_container(
-            image=args.containerId,
+            image=args.imageId,
             entrypoint="/bin/cat",
             command=args.file)
     except:

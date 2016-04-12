@@ -24,9 +24,9 @@ from mock import patch
 
 def test_cat_parsing():
     parser = main.build_parser()
-    args = parser.parse_args('cat containerId /root/foo bar /bar/baz'.split())
+    args = parser.parse_args('cat imageId /root/foo bar /bar/baz'.split())
     assert args.func == cat.command_cat
-    assert args.containerId == 'containerId'
+    assert args.imageId == 'imageId'
     assert args.file == ['/root/foo', 'bar', '/bar/baz']
 
 
@@ -44,7 +44,7 @@ def test_ls_run(utils):
 
     # Set up args
     args = argparse.Namespace()
-    args.containerId = 'testContainerId'
+    args.imageId = 'testImageId'
     args.file = '/grader/testCases.txt'
 
     with patch('courseraprogramming.commands.cat.sys.stdout') as stdout:
@@ -55,7 +55,7 @@ def test_ls_run(utils):
     stdout.write.assert_called_with(docker_mock.logs.return_value)
 
     docker_mock.create_container.assert_called_with(
-        image='testContainerId',
+        image='testImageId',
         entrypoint='/bin/cat',
         command='/grader/testCases.txt')
     docker_mock.start.assert_called_with(

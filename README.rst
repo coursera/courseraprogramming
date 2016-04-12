@@ -79,9 +79,9 @@ Examples:
    the container running as a deprivileged user, with memory constraints and the
    network configured similar to the production environment.
  - ``courseraprogramming inspect --super-user --unlimited-memory --allow-network
-   $MY_CONTAINER_ID`` launches a shell running as a root user with the
+   $MY_CONTAINER_IMAGE`` launches a shell running as a root user with the
    production-simulating constraints removed.
- - ``courseraprogramming inspect -d /path/to/sample/submission $MY_CONTAINER_ID``
+ - ``courseraprogramming inspect -d /path/to/sample/submission $MY_CONTAINER_IMAGE``
    launches a container mapping the sample submission on the host into the
    grading container. If you interactively invoke the configured grading script
    and interactively debug your grader.

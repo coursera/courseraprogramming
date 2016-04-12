@@ -50,9 +50,9 @@ def get_container_image(args, d):
     # TODO: get information on the image, and run a few basic sanity checks.
     # (e.g. check for ENTRYPOINT, etc.)
 
-    image = d.get_image(args.containerId)
+    image = d.get_image(args.imageId)
     image_file_name = \
-        args.containerId if args.file_name is None else args.file_name
+        args.imageId if args.file_name is None else args.file_name
     image_file_name = image_file_name.replace('/', '_')
     if not image_file_name.endswith('.tar'):
         image_file_name += '.tar'
@@ -61,7 +61,7 @@ def get_container_image(args, d):
     logging.debug('Image file path: %s', image_file_path)
     if not args.quiet > 0:
         sys.stdout.write(
-            'Saving image %s to %s...' % (args.containerId, image_file_path))
+            'Saving image %s to %s...' % (args.imageId, image_file_path))
         sys.stdout.flush()
     with open(image_file_path, 'w') as image_tar:
         image_tar.write(image.data)

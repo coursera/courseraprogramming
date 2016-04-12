@@ -24,7 +24,7 @@ def test_inspect_parsing():
     parser = main.build_parser()
     args = parser.parse_args('inspect demo/primes'.split())
     assert args.func == inspect.command_inspect
-    assert args.containerId == 'demo/primes'
+    assert args.imageId == 'demo/primes'
     assert not args.no_rm
 
 
@@ -33,7 +33,7 @@ def test_ls_run(os):
 
     # Set up args
     args = argparse.Namespace()
-    args.containerId = 'testContainerId'
+    args.imageId = 'testImageId'
     args.shell = '/bin/bash'
     args.allow_network = False
     args.unlimited_memory = False
@@ -57,7 +57,7 @@ def test_ls_run(os):
         '--rm',
         '-u',
         '1000',
-        'testContainerId',
+        'testImageId',
     ])
 
 
@@ -66,7 +66,7 @@ def test_ls_run_without_limits(os):
 
     # Set up args
     args = argparse.Namespace()
-    args.containerId = 'testContainerId'
+    args.imageId = 'testImageId'
     args.shell = '/bin/bash'
     args.allow_network = True
     args.unlimited_memory = True
@@ -83,5 +83,5 @@ def test_ls_run_without_limits(os):
         '-it',
         '--entrypoint',
         '/bin/bash',
-        'testContainerId',
+        'testImageId',
     ])

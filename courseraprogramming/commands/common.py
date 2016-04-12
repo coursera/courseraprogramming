@@ -31,8 +31,8 @@ def container_parser():
     # all these options here.
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument(
-        'containerId',
-        help='The container id to operate on.')
+        'imageId',
+        help='The container image id or container tag to operate on.')
 
     return parser
 

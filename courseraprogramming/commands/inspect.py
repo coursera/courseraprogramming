@@ -49,7 +49,7 @@ def command_inspect(args):
         # Note: docker run CLI doesn't support setting the group. :-(
         command_line.append('-u')
         command_line.append('1000')
-    command_line.append(args.containerId)
+    command_line.append(args.imageId)
     logging.debug("About to execute command: %s", ' '.join(command_line))
     os.execvp('docker', command_line)
 

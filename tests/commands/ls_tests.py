@@ -27,7 +27,7 @@ def test_ls_parsing_simple():
     args = parser.parse_args('ls a1b2c3 /'.split())
     assert args.func == ls.command_ls, "func: %s" % args.func
     assert args.dir == '/', "Dir is: %s" % args.dir
-    assert args.containerId == 'a1b2c3', "Container id: %s" % args.containerId
+    assert args.imageId == 'a1b2c3', "Container id: %s" % args.imageId
 
 
 def test_ls_parsing_flags():
@@ -35,7 +35,7 @@ def test_ls_parsing_flags():
     args = parser.parse_args('ls -al --human my-container /foo/bar'.split())
     assert args.func == ls.command_ls
     assert args.dir == '/foo/bar', args.dir
-    assert args.containerId == 'my-container', args.containerId
+    assert args.imageId == 'my-container', args.imageId
     assert args.a
     assert args.l
     assert args.human
@@ -55,7 +55,7 @@ def test_ls_run(utils):
 
     # Set up args
     args = argparse.Namespace()
-    args.containerId = 'testContainerId'
+    args.imageId = 'testImageId'
     args.dir = '/grader'
 
     with patch('courseraprogramming.commands.ls.sys.stdout') as stdout:
@@ -66,7 +66,7 @@ def test_ls_run(utils):
     stdout.write.assert_called_with(docker_mock.logs.return_value)
 
     docker_mock.create_container.assert_called_with(
-        image='testContainerId',
+        image='testImageId',
         entrypoint='/bin/ls',
         command='/grader')
     docker_mock.start.assert_called_with(

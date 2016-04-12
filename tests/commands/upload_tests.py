@@ -27,8 +27,8 @@ from testfixtures import LogCapture
 def test_upload_parsing():
     parser = main.build_parser()
     args = parser.parse_args(
-               'upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID'.split())
-    assert args.containerId == 'CONTAINER_ID'
+               'upload CONTAINER_IMAGE_ID COURSE_ID ITEM_ID PART_ID'.split())
+    assert args.imageId == 'CONTAINER_IMAGE_ID'
     assert args.course == 'COURSE_ID'
     assert args.item == 'ITEM_ID'
     assert args.part == 'PART_ID'
@@ -37,7 +37,8 @@ def test_upload_parsing():
 
 def test_upload_parsing_with_additional_items():
     parser = main.build_parser()
-    args = parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+    args = parser.parse_args('upload CONTAINER_IMAGE_ID COURSE_ID ITEM_ID '
+                             'PART_ID '
                              '--additional_item_and_part ITEM_2 PART_2 '
                              '--additional_item_and_part ITEM_3 PART_3'
                              .split())
@@ -47,7 +48,8 @@ def test_upload_parsing_with_additional_items():
 
 def test_upload_parsing_with_resource_customization():
     parser = main.build_parser()
-    args = parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+    args = parser.parse_args('upload CONTAINER_IMAGE_ID COURSE_ID ITEM_ID '
+                             'PART_ID '
                              '--grader-cpu 1 '
                              '--grader-memory-limit 1024 '
                              '--grading-timeout 300 '
@@ -61,7 +63,8 @@ def test_upload_parsing_with_resource_customization():
 def test_upload_parsing_invalid_cpu():
     parser = main.build_parser()
     try:
-        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+        parser.parse_args('upload CONTAINER_IMAGE_ID COURSE_ID ITEM_ID '
+                          'PART_ID '
                           '--grader-cpu 3 '
                           '--grader-memory-limit 1024 '
                           '--grading-timeout 300 '
@@ -76,7 +79,8 @@ def test_upload_parsing_invalid_cpu():
 def test_upload_parsing_invalid_memory():
     parser = main.build_parser()
     try:
-        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+        parser.parse_args('upload CONTAINER_IMAGE_ID COURSE_ID ITEM_ID '
+                          'PART_ID '
                           '--grader-cpu 1 '
                           '--grader-memory-limit 3 '
                           '--grading-timeout 300 '
@@ -91,7 +95,8 @@ def test_upload_parsing_invalid_memory():
 def test_upload_parsing_timeout_too_low():
     parser = main.build_parser()
     try:
-        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+        parser.parse_args('upload CONTAINER_IMAGE_ID COURSE_ID ITEM_ID '
+                          'PART_ID '
                           '--grader-cpu 1 '
                           '--grader-memory-limit 1024 '
                           '--grading-timeout 299 '
@@ -106,7 +111,8 @@ def test_upload_parsing_timeout_too_low():
 def test_upload_parsing_timeout_too_high():
     parser = main.build_parser()
     try:
-        parser.parse_args('upload CONTAINER_ID COURSE_ID ITEM_ID PART_ID '
+        parser.parse_args('upload CONTAINER_IMAGE_ID COURSE_ID ITEM_ID '
+                          'PART_ID '
                           '--grader-cpu 1 '
                           '--grader-memory-limit 1024 '
                           '--grading-timeout 1801 '
