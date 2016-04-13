@@ -118,10 +118,16 @@ def docker_client(args):
     if _platform == 'linux' or _platform == 'linux2':
         # linux
         if "docker_url" in args:
-            return Client(base_url=args.docker_url, timeout=args.timeout)
+            return Client(
+                base_url=args.docker_url,
+                timeout=args.timeout,
+                version='auto')
         else:
             # TODO: test to see if this does the right thing by default.
-            return Client(timeout=args.timeout, **kwargs_from_env())
+            return Client(
+                version='auto',
+                timeout=args.timeout,
+                **kwargs_from_env())
     elif _platform == 'darwin':
         # OS X - Assume boot2docker, and pull from that environment.
         kwargs = kwargs_from_env()
@@ -132,7 +138,7 @@ def docker_client(args):
         if not args.strict_docker_tls:
             kwargs['tls'].assert_hostname = False
 
-        return Client(timeout=args.timeout, **kwargs)
+        return Client(version='auto', timeout=args.timeout, **kwargs)
     elif _platform == 'win32' or _platform == 'cygwin':
         # Windows.
         logging.fatal("Sorry, windows is not currently supported!")
