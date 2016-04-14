@@ -341,11 +341,16 @@ def parser(subparsers):
 
     parser_upload.add_argument(
         'course',
-        help='The course id to associate the grader.')
+        help='The course id to associate the grader. The course id is a '
+        'gibberish string UUID. Given a course slug such as `developer-iot`, '
+        'you can retrieve the course id by querying the catalog API. e.g.: '
+        'https://api.coursera.org/api/courses.v1?q=slug&slug=developer-iot')
 
     parser_upload.add_argument(
         'item',
-        help='The id of the item to associate the grader.')
+        help='The id of the item to associate the grader. The easiest way '
+        'to find the item id is by looking at the URL in the authoring web '
+        'interface. It is the last part of the URL, and is a short UUID.')
 
     parser_upload.add_argument(
         'part',

@@ -21,7 +21,7 @@ To install this sdk, simply execute::
 `pip <https://pip.pypa.io/en/latest/index.html>`_ is a python package manager.
 If you do not have ``pip`` installed on your machine, please follow the
 installation instructions for your platform found at:
-<https://pip.pypa.io/en/latest/installing.html#install-or-upgrade-pip>
+https://pip.pypa.io/en/latest/installing.html#install-or-upgrade-pip
 
 The tool includes its own usage information and documentation. Simply run::
 
@@ -123,6 +123,17 @@ machine, and install it in the jenkins home folder. Beware that the oauth2_cache
 file within that directory contains a refresh token for the user who authorized
 themselves. This refresh token should be treated as if it were a password and
 not shared or otherwise disclosed!
+
+To find the course id, item id, and part id, first go to the web authoring
+interface for your programming assignment. There, the URL will be of the form:
+``/:courseSlug/author/outline/programming/:itemId/``. The part id will be
+displayed in the authoring user interface for each part. To convert the
+``courseSlug`` into a ``courseId``, you can take advantage of our `Catalog API
+<https://building.coursera.org/app-platform/catalog>`_. For example, given a
+course slug of ``developer-iot``, you can query the course id by making the
+request: ``https://api.coursera.org/api/courses.v1?q=slug&slug=developer-iot``.
+The response will be a JSON object containing an ``id`` field with the value:
+``iRl53_BWEeW4_wr--Yv6Aw``.
 
 This command can also be used to customize the resources that will be allocated
 to your grader when it grades learner submissions. The CPU, memory limit and
