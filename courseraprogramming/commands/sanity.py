@@ -40,10 +40,7 @@ def command_sanity(args):
         docker_version = conn.version()
         logging.info("Docker version: %s", docker_version["Version"])
         if semver.match(docker_version["Version"], '>1.5.0'):
-            if semver.match(docker_version["Version"], '<=1.9.1'):
-                logging.info("Docker version ok.")
-            else:
-                logging.error("Docker version must be <=1.9.1")
+            logging.info("Docker version ok.")
         else:
             logging.error("Docker version must be >1.5.0.")
 
