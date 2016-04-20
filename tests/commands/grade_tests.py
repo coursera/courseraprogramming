@@ -31,17 +31,19 @@ def test_grade_local_parsing():
     assert args.imageId == 'myimageId'
     assert args.dir == '/tmp'
     assert not args.no_rm
+    assert args.mem_limit == 1024
 
 
 def test_grade_local_parsing_with_extra_args():
     parser = main.build_parser()
     args = parser.parse_args(
-        'grade local --no-rm myimageId /tmp arg1 arg2'.split())
+        'grade local --no-rm --mem-limit 2048 myimageId /tmp a1 a2'.split())
     assert args.func == grade.command_grade_local
     assert args.imageId == 'myimageId'
     assert args.dir == '/tmp'
-    assert args.args == ['arg1', 'arg2']
+    assert args.args == ['a1', 'a2']
     assert args.no_rm
+    assert args.mem_limit == 2048
 
 
 @patch('courseraprogramming.commands.grade.sys')
@@ -435,6 +437,7 @@ def test_command_local_grade_simple(
     args = argparse.Namespace()
     args.dir = '/tmp'
     args.imageId = 'myimageId'
+    args.mem_limit = 1024
 
     common.mk_submission_volume_str.return_value = 'foo'
     docker_mock = MagicMock()
@@ -472,6 +475,7 @@ def test_command_local_grade_with_extra_args(run_container, utils, common):
     args = argparse.Namespace()
     args.dir = '/tmp'
     args.imageId = 'myimageId'
+    args.mem_limit = 2048
     args.args = ['extra', 'args']
     common.mk_submission_volume_str.return_value = 'foo'
     docker_mock = MagicMock()
@@ -494,8 +498,8 @@ def test_command_local_grade_with_extra_args(run_container, utils, common):
         host_config=docker.utils.create_host_config(
             binds=['foo', ],
             network_mode='none',
-            mem_limit='1g',
-            memswap_limit='1g',
+            mem_limit='2g',
+            memswap_limit='2g',
         ),
     )
     run_container.assert_called_with(

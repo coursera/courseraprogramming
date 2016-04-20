@@ -112,20 +112,37 @@ def run_container(docker, container, args):
         sys.exit(1)
 
 
+class MemoryFormatError(BaseException):
+    def __repr__(self):
+        return "mem-limit must be a multiple of 1024."
+
+
+def compute_memory_limit(args):
+    """
+    Convert the memory limit input into a format Docker expects. Raises an
+    exception if it is of an unexpected value.
+    """
+    if args.mem_limit % 1024 == 0:
+        return "%sg" % (args.mem_limit / 1024)
+    else:
+        raise MemoryFormatError()
+
+
 def command_grade_local(args):
     """
     The 'local' sub-sub-command of the 'grade' sub-command simulates running a
     grader on a sample submission from the local file system.
     """
     d = utils.docker_client(args)
+    memory_limit = compute_memory_limit(args)
     try:
         volume_str = common.mk_submission_volume_str(args.dir)
         logging.debug("Volume string: %s", volume_str)
         host_config = docker.utils.create_host_config(
                 binds=[volume_str, ],
                 network_mode='none',
-                mem_limit='1g',
-                memswap_limit='1g',
+                mem_limit=memory_limit,
+                memswap_limit=memory_limit,
             )
         user = '%s' % 1000
 
@@ -175,6 +192,11 @@ def parser(subparsers):
         type=int,
         default=300,
         help='The time out the grader after TIMEOUT seconds')
+    common_flags.add_argument(
+        '--mem-limit',
+        type=int,
+        default=1024,
+        help='The amount of memory allocated to the grader')
     grade_subparsers = parser_grade.add_subparsers()
 
     # Local subsubcommand of the grade subcommand
