@@ -57,6 +57,10 @@ def test_ls_run(utils):
     args = argparse.Namespace()
     args.imageId = 'testImageId'
     args.dir = '/grader'
+    args.l = False
+    args.human = False
+    args.a = False
+    args.no_rm = False
 
     with patch('courseraprogramming.commands.ls.sys.stdout') as stdout:
         # Run the command
@@ -68,7 +72,7 @@ def test_ls_run(utils):
     docker_mock.create_container.assert_called_with(
         image='testImageId',
         entrypoint='/bin/ls',
-        command='/grader')
+        command=['/grader'])
     docker_mock.start.assert_called_with(
         docker_mock.create_container.return_value)
     docker_mock.logs.assert_called_with(

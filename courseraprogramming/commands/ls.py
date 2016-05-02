@@ -29,11 +29,20 @@ import sys
 def command_ls(args):
     "Implements the ls subcommand"
     d = utils.docker_client(args)
+    command = []
+    if args.l:
+        command.append('-l')
+    if args.human:
+        command.append('-h')
+    if args.a:
+        command.append('-a')
+    command.append(args.dir)
+    logging.debug("Commands: %s", command)
     try:
         container = d.create_container(
             image=args.imageId,
             entrypoint="/bin/ls",
-            command=args.dir)
+            command=command)
     except:
         logging.error(
             "Could not set up the container to run the ls command in. Most "
@@ -49,6 +58,8 @@ def command_ls(args):
     command_output = d.logs(container)
     # Use sys.stdout to avoid extra trailing newline. (Py3.x compatible)
     sys.stdout.write(command_output)
+    if not args.no_rm:
+        d.remove_container(container)
 
 
 def parser(subparsers):
@@ -77,5 +88,9 @@ def parser(subparsers):
     parser_ls.add_argument(
         'dir',
         help='The directory to list. (e.g. /grader)')
+    parser_ls.add_argument(
+        '--no-rm',
+        action='store_true',
+        help="Don't remove the container after running the ls command.")
 
     return parser_ls
