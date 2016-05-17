@@ -128,10 +128,9 @@ To find the course id, item id, and part id, first go to the web authoring
 interface for your programming assignment. There, the URL will be of the form:
 ``/:courseSlug/author/outline/programming/:itemId/``. The part id will be
 displayed in the authoring user interface for each part. To convert the
-``courseSlug`` into a ``courseId``, you can take advantage of our `Catalog API
-<https://building.coursera.org/app-platform/catalog>`_. For example, given a
+``courseSlug`` into a ``courseId``, you can take advantage of our `Course API` putting in the appropriate ``courseSlug``. For example, given a
 course slug of ``developer-iot``, you can query the course id by making the
-request: ``https://api.coursera.org/api/courses.v1?q=slug&slug=developer-iot``.
+request: ``https://api.coursera.org/api/onDemandCourses.v1?q=slug&slug=developer-iot``.
 The response will be a JSON object containing an ``id`` field with the value:
 ``iRl53_BWEeW4_wr--Yv6Aw``.
 
