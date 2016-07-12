@@ -82,6 +82,9 @@ def build_parser():
     # create the parser for the publish command.
     commands.publish.parser(subparsers)
 
+    # create the parser for the reregister command.
+    commands.reregister.parser(subparsers)
+
     return parser
 
 

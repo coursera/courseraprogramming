@@ -237,14 +237,23 @@ def command_upload(args):
 
     # Rebuild an authorizer to ensure it's fresh and not expired
     auth = oauth2_instance.build_authorizer()
+    grader_id = register_grader(auth,
+                                args,
+                                bucket=upload_information[0],
+                                key=upload_information[1])
 
+    return update_assignments(auth, grader_id, args)
+
+
+def register_grader(auth, args, bucket, key):
     grader_cpu = None
+
     if hasattr(args, 'grader_cpu') and args.grader_cpu is not None:
         grader_cpu = args.grader_cpu * 1024
     register_request = {
         'courseId': args.course,
-        'bucket': upload_information[0],
-        'key': upload_information[1],
+        'bucket': bucket,
+        'key': key,
         'reservedCpu': grader_cpu,
         'reservedMemory': getattr(args, 'grader_memory_limit', None),
         'wallClockTimeout': getattr(args, 'grading_timeout', None),
@@ -260,7 +269,7 @@ def command_upload(args):
             'Failed to register grader (%s) with Coursera: %s',
             upload_information[1],
             register_result.text)
-        return 1
+        raise Exception('Failed to register grader')
 
     try:
         grader_id = register_result.json()['elements'][0]['executorId']
@@ -270,11 +279,11 @@ def command_upload(args):
             'Could not parse the response from the Coursera register grader '
             'endpoint: %s',
             register_result.text)
-        return 1
+        raise Exception('Cannot parse response')
 
     logging.info('The grader status API is at: %s', location)
 
-    return update_assignments(auth, grader_id, args)
+    return grader_id
 
 
 def update_assignment(auth, grader_id, args, item, part):
@@ -291,8 +300,9 @@ def update_assignment(auth, grader_id, args, item, part):
     if update_result.status_code != 200:
         logging.error(
             'Unable to update the assignment to use the new grader. Param: %s '
-            'URL: %s Response: %s',
+            'Status Code: %d URL: %s Response: %s',
             update_assignment_params,
+            update_result.status_code,
             update_result.url,
             update_result.text)
         return 1
@@ -325,12 +335,80 @@ def update_assignments(auth, grader_id, args):
     return return_result
 
 
-def parser(subparsers):
-    "Build an argparse argument parser to parse the command line."
+def setup_registration_parser(parser):
+    'This is a helper function to coalesce all the common registration'
+    'parameters for code reuse.'
 
     # constants for timeout ranges
     TIMEOUT_LOWER = 300
     TIMEOUT_UPPER = 1800
+
+    parser.add_argument(
+        'course',
+        help='The course id to associate the grader. The course id is a '
+        'gibberish string UUID. Given a course slug such as `developer-iot`, '
+        'you can retrieve the course id by querying the catalog API. e.g.: '
+        'https://api.coursera.org/api/courses.v1?q=slug&slug=developer-iot')
+
+    parser.add_argument(
+        'item',
+        help='The id of the item to associate the grader. The easiest way '
+        'to find the item id is by looking at the URL in the authoring web '
+        'interface. It is the last part of the URL, and is a short UUID.')
+
+    parser.add_argument(
+        'part',
+        help='The id of the part to associate the grader.')
+
+    parser.add_argument(
+        '--additional_item_and_part',
+        nargs=2,
+        action='append',
+        help='The next two args specify an item ID and part ID which will '
+             'also be associated with the grader.')
+
+    parser.add_argument(
+        '--grader-cpu',
+        type=int,
+        choices=[1, 2],
+        help='Amount of CPU your grader is allocated when grading '
+             'submissions. You may choose from 1 or 2 full CPU cores. The '
+             'default number is 1.')
+
+    parser.add_argument(
+        '--grader-memory-limit',
+        type=int,
+        choices=[1024, 2048],
+        help='Amount of memory your grader is allocated when grading '
+             'submissions. You may choose from 1024 MB or 2048 MB. The '
+             'default amount is 1024 MB.')
+
+    parser.add_argument(
+        '--grading-timeout',
+        type=lambda v: utils.check_int_range(v, TIMEOUT_LOWER, TIMEOUT_UPPER),
+        help='Amount of time allowed before your grader times out, in '
+             'seconds. You may choose any value between 300 seconds and 1800 '
+             'seconds.  The default time is 1200 seconds (20 minutes).')
+
+    parser.add_argument(
+        '--register-endpoint',
+        default='https://api.coursera.org/api/gridExecutorCreationAttempts.v1',
+        help='Override the endpoint used to register the graders after upload')
+
+    parser.add_argument(
+        '--update-part-endpoint',
+        default='https://api.coursera.org/api/'
+                'authoringProgrammingAssignments.v1',
+        help='Override the endpoint used to update the assignment (draft)')
+
+    parser.add_argument(
+        '--update-part-action',
+        default='setGridExecutorId',
+        help='The name of the Naptime action called to update the assignment')
+
+
+def parser(subparsers):
+    "Build an argparse argument parser to parse the command line."
 
     # create the parser for the upload command.
     parser_upload = subparsers.add_parser(
@@ -339,52 +417,7 @@ def parser(subparsers):
         parents=[common.container_parser()])
     parser_upload.set_defaults(func=command_upload)
 
-    parser_upload.add_argument(
-        'course',
-        help='The course id to associate the grader. The course id is a '
-        'gibberish string UUID. Given a course slug such as `developer-iot`, '
-        'you can retrieve the course id by querying the catalog API. e.g.: '
-        'https://api.coursera.org/api/courses.v1?q=slug&slug=developer-iot')
-
-    parser_upload.add_argument(
-        'item',
-        help='The id of the item to associate the grader. The easiest way '
-        'to find the item id is by looking at the URL in the authoring web '
-        'interface. It is the last part of the URL, and is a short UUID.')
-
-    parser_upload.add_argument(
-        'part',
-        help='The id of the part to associate the grader.')
-
-    parser_upload.add_argument(
-        '--additional_item_and_part',
-        nargs=2,
-        action='append',
-        help='The next two args specify an item ID and part ID which will '
-             'also be associated with the grader.')
-
-    parser_upload.add_argument(
-        '--grader-cpu',
-        type=int,
-        choices=[1, 2],
-        help='Amount of CPU your grader is allocated when grading '
-             'submissions. You may choose from 1 or 2 full CPU cores. The '
-             'default number is 1.')
-
-    parser_upload.add_argument(
-        '--grader-memory-limit',
-        type=int,
-        choices=[1024, 2048],
-        help='Amount of memory your grader is allocated when grading '
-             'submissions. You may choose from 1024 MB or 2048 MB. The '
-             'default amount is 1024 MB.')
-
-    parser_upload.add_argument(
-        '--grading-timeout',
-        type=lambda v: utils.check_int_range(v, TIMEOUT_LOWER, TIMEOUT_UPPER),
-        help='Amount of time allowed before your grader times out, in '
-             'seconds. You may choose any value between 300 seconds and 1800 '
-             'seconds.  The default time is 1200 seconds (20 minutes).')
+    setup_registration_parser(parser_upload)
 
     parser_upload.add_argument(
         '--temp-dir',
@@ -409,21 +442,5 @@ def parser(subparsers):
         '--transloadit-account-id',
         default='05912e90e83346abb96c261bf458b615',
         help='The Coursera transloadit account id.')
-
-    parser_upload.add_argument(
-        '--register-endpoint',
-        default='https://api.coursera.org/api/gridExecutorCreationAttempts.v1',
-        help='Override the endpoint used to register the graders after upload')
-
-    parser_upload.add_argument(
-        '--update-part-endpoint',
-        default='https://api.coursera.org/api/'
-                'authoringProgrammingAssignments.v1',
-        help='Override the endpoint used to update the assignment (draft)')
-
-    parser_upload.add_argument(
-        '--update-part-action',
-        default='setGridExecutorId',
-        help='The name of the Naptime action called to update the assignment')
 
     return parser_upload

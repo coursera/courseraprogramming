@@ -7,6 +7,7 @@ __all__ = [
     "inspect",
     "ls",
     "publish",
+    "reregister",
     "sanity",
     "upload",
     "version",
