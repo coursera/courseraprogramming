@@ -348,7 +348,8 @@ def setup_registration_parser(parser):
         help='The course id to associate the grader. The course id is a '
         'gibberish string UUID. Given a course slug such as `developer-iot`, '
         'you can retrieve the course id by querying the catalog API. e.g.: '
-        'https://api.coursera.org/api/courses.v1?q=slug&slug=developer-iot')
+        'https://api.coursera.org/api/onDemandCourses.v1?q=slug&'
+        'slug=developer-iot')
 
     parser.add_argument(
         'item',
