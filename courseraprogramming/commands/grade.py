@@ -138,7 +138,7 @@ def command_grade_local(args):
     try:
         volume_str = common.mk_submission_volume_str(args.dir)
         logging.debug("Volume string: %s", volume_str)
-        host_config = docker.utils.create_host_config(
+        host_config = d.create_host_config(
                 binds=[volume_str, ],
                 network_mode='none',
                 mem_limit=memory_limit,

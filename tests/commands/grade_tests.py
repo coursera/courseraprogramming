@@ -447,20 +447,20 @@ def test_command_local_grade_simple(
     utils.docker_client.return_value = docker_mock
 
     h_config = {'foo': 'bar'}  # just some unique value
-    docker_utils.create_host_config.return_value = h_config
+    docker_mock.create_host_config.return_value = h_config
 
     grade.command_grade_local(args)
 
-    docker_utils.create_host_config.assert_called_with(
-        binds=['foo', ],
-        network_mode='none',
-        mem_limit='1g',
-        memswap_limit='1g',
-    )
     docker_mock.create_container.assert_called_with(
         image='myimageId',
         user='1000',
         host_config=h_config,
+    )
+    docker_mock.create_host_config.assert_called_with(
+        binds=['foo', ],
+        network_mode='none',
+        mem_limit='1g',
+        memswap_limit='1g',
     )
     run_container.assert_called_with(
         docker_mock,
@@ -487,6 +487,8 @@ def test_command_local_grade_with_extra_args(run_container, utils, common):
             "Entrypoint": ["command"],
         }
     }
+    h_config = {'foo': 'bar'}  # just some unique value
+    docker_mock.create_host_config.return_value = h_config
     utils.docker_client.return_value = docker_mock
 
     grade.command_grade_local(args)
@@ -495,12 +497,13 @@ def test_command_local_grade_with_extra_args(run_container, utils, common):
         image='myimageId',
         entrypoint=['command', 'extra', 'args'],
         user='1000',
-        host_config=docker.utils.create_host_config(
-            binds=['foo', ],
-            network_mode='none',
-            mem_limit='2g',
-            memswap_limit='2g',
-        ),
+        host_config=h_config
+    )
+    docker_mock.create_host_config.assert_called_with(
+        binds=['foo', ],
+        network_mode='none',
+        mem_limit='2g',
+        memswap_limit='2g',
     )
     run_container.assert_called_with(
         docker_mock,
