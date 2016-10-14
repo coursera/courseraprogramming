@@ -29,6 +29,7 @@ import multiprocessing
 import os.path
 import re
 import requests
+import requests_toolbelt
 import sys
 import time
 import uuid
@@ -103,9 +104,14 @@ def upload(args, upload_url, file_info):
         }
         params = json.dumps(transloadit_auth_info)
         logging.debug('About to start the upload.')
+        m = requests_toolbelt.MultipartEncoder({
+            'params': params,
+            'file': files[0][1],
+        })
+
         response = requests.post(upload_url,
-                                 files=files,
-                                 data={'params': params})
+                                 data=m,
+                                 headers={'Content-Type': m.content_type})
         logging.debug('Upload complete... code: %s %s', response.status_code,
                       response.text)
 
