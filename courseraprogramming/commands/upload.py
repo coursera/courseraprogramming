@@ -387,7 +387,7 @@ def setup_registration_parser(parser):
         type=int,
         choices=[1024, 2048, 3072, 4096],
         help='Amount of memory your grader is allocated when grading '
-             'submissions. You may choose from 1024, 2048, 3072 or ' 
+             'submissions. You may choose from 1024, 2048, 3072 or '
              '4096 MB. The default amount is 1024 MB.')
 
     parser.add_argument(
