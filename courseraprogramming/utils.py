@@ -134,7 +134,15 @@ def docker_client(args):
         if not args.strict_docker_tls and 'tls' in kwargs:
             kwargs['tls'].assert_hostname = False
 
-        return Client(version='auto', timeout=args.timeout, **kwargs)
+        try:
+            return Client(version='auto', timeout=args.timeout, **kwargs)
+        except:
+            logging.error(
+                'Could not connect to the docker daemon. ' +
+                'Please make sure docker is running.'
+            )
+            sys.exit(2)
+
     elif _platform == 'win32' or _platform == 'cygwin':
         # Windows.
         logging.fatal("Sorry, windows is not currently supported!")
