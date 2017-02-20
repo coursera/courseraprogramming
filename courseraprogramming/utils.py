@@ -21,7 +21,7 @@ You may install it from source, or via pip.
 """
 
 import argparse
-from docker.client import Client
+from docker import Client
 from docker.utils import kwargs_from_env
 import requests
 import logging
@@ -129,13 +129,9 @@ def docker_client(args):
                 timeout=args.timeout,
                 **kwargs_from_env())
     elif _platform == 'darwin':
-        # OS X - Assume boot2docker, and pull from that environment.
+        # OS X.
         kwargs = kwargs_from_env()
-        if len(kwargs) == 0:
-            logging.error('Could not correctly pull in docker environment. '
-                          'Try running: eval "$(docker-machine env default)"')
-            sys.exit(2)
-        if not args.strict_docker_tls:
+        if not args.strict_docker_tls and 'tls' in kwargs:
             kwargs['tls'].assert_hostname = False
 
         return Client(version='auto', timeout=args.timeout, **kwargs)

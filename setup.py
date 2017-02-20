@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='courseraprogramming',
-      version='0.18.0',
+      version='0.19.0',
       description='A toolkit to help develop asynchronous graders for Coursera\
           based on docker images.',
       long_description=readme(),
@@ -28,11 +28,11 @@ setup(name='courseraprogramming',
       },
       packages=['courseraprogramming', 'courseraprogramming.commands'],
       install_requires=[
-          'dockerfile-parse>=0.0.3',
-          'docker-py>=1.4.0',
-          'requests>=2.7.0',
-          'requests-toolbelt>=0.7.0',
-          'semver>=2.2.0',
+          'dockerfile-parse==0.0.6',
+          'docker-py==1.10.4',
+          'requests==2.9.2',
+          'requests-toolbelt==0.7.1',
+          'semver==2.7.5',
       ],
       test_suite='nose.collector',
       tests_require=['nose', 'nose-cover3'],
