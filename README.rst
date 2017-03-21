@@ -134,6 +134,8 @@ request: ``https://api.coursera.org/api/onDemandCourses.v1?q=slug&slug=developer
 The response will be a JSON object containing an ``id`` field with the value:
 ``iRl53_BWEeW4_wr--Yv6Aw``.
 
+The uploaded grader can be linked to multiple (itemId, partId) pairs without making duplicate uploads by using the ``--additional_item_and_part`` flag.
+
 This command can also be used to customize the resources that will be allocated
 to your grader when it grades learner submissions. The CPU, memory limit and
 timeout are all customizable.
@@ -152,9 +154,15 @@ timeout are all customizable.
 Examples:
  - ``courseraprogramming upload $MY_CONTAINER_IMAGE $COURSE_ID $ITEM_ID
    $PART_ID`` uploads the specified grader container image to Coursera, begins
-   and the post-upload processing, and associates the new grader with the
-   specified item part in a new draft. Navigate to the course authoring UI to
-   publish the draft to make it live.
+   the post-upload processing, and associates the new grader with the
+   specified item part in a new draft. Navigate to the course authoring UI
+   or use the `publish` command to publish the draft to make it live.
+ - ``courseraprogramming upload $MY_CONTAINER_IMAGE $COURSE_ID $ITEM_ID $PART_ID
+   --additional_item_and_part $ITEM_ID2 $PART_ID2 $ITEM_ID3 $PART_ID3`` uploads
+   the specified graded container image to Coursera, begins the post-upload procesing,
+   and associates the new grader with all the three item_id part_id pairs.
+   Navigate to the course authoring UI for each item, or use the `publish` command with
+   ``--additional-items`` flag to publish the draft to make it live.
  - ``courseraprogramming upload --help`` displays all available options
    for the :code:`upload` subcommand.
 
