@@ -39,10 +39,6 @@ def command_sanity(args):
         conn = utils.docker_client(args)
         docker_version = conn.version()
         logging.info("Docker version: %s", docker_version["Version"])
-        if semver.match(docker_version["Version"], '>1.5.0'):
-            logging.info("Docker version ok.")
-        else:
-            logging.error("Docker version must be >1.5.0.")
 
     if "docker_file" in args and args.docker_file is not None:
         try:
