@@ -18,8 +18,8 @@ setup(name='courseraprogramming',
       ],
       keywords='grading programming coursera sdk docker cli tool',
       url='https://github.com/coursera/courseraprogramming',
-      author='Brennan Saeta',
-      author_email='saeta@coursera.org',
+      author='Nikhil Garg',
+      author_email='ngarg@coursera.org',
       license='Apache',
       entry_points={
           'console_scripts': [
