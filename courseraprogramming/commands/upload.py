@@ -167,8 +167,10 @@ def poll_transloadit(args, upload_url):
                     body)
                 raise Exception('Error parsing the transloadit response.')
             else:
-                match = re.match('https://([^\\.]+).s3.amazonaws.com/(.+)',
-                                 s3_link)
+                match = re.match(
+                    'https://([^\\.]+).s3[^\\.]*.amazonaws.com/(.+)',
+                    s3_link
+                )
                 if match is None:
                     logging.error(
                         'Could not parse the uploaded url correctly. URL: %s',
