@@ -379,10 +379,10 @@ def setup_registration_parser(parser):
     parser.add_argument(
         '--grader-cpu',
         type=int,
-        choices=[1, 2],
+        choices=[1, 2, 3, 4],
         help='Amount of CPU your grader is allocated when grading '
-             'submissions. You may choose from 1 or 2 full CPU cores. The '
-             'default number is 1.')
+             'submissions. You may choose from 1, 2, 3 or 4 full '
+             'CPU cores. The default number is 1.')
 
     parser.add_argument(
         '--grader-memory-limit',
