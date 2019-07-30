@@ -407,7 +407,7 @@ def setup_registration_parser(parser):
     parser.add_argument(
         '--update-part-endpoint',
         default='https://api.coursera.org/api/'
-                'authoringProgrammingAssignments.v1',
+                'authoringProgrammingAssignments.v2',
         help='Override the endpoint used to update the assignment (draft)')
 
     parser.add_argument(

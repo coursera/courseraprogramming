@@ -49,9 +49,8 @@ class GraderExecutorError(Exception):
 
 class ItemNotFoundError(Exception):
 
-    def __init__(self, course_id, item_id):
-        self.course_id = course_id
-        self.item_id = item_id
+    def __init__(self, id):
+        self.id = id
 
 
 class ValidationError(Exception):
@@ -59,6 +58,10 @@ class ValidationError(Exception):
 
 
 class InternalError(Exception):
+    pass
+
+
+class ProgrammingAssignmentDraftNotReadyError(Exception):
     pass
 
 
@@ -71,24 +74,25 @@ def command_publish(args):
         logging.info("Starting publish for item {} in course {}".format(
             item_id, course_id))
         try:
-            logging.info("Fetching required metadata...")
-            metadata = get_metadata(
-                oauth2_instance, args.get_endpoint, course_id, item_id)
+            logging.info("Fetching required write access token...")
+            authoring_pa_id = get_authoring_pa_id(
+                oauth2_instance, course_id, item_id)
+            write_access_token = get_write_access_token(
+                oauth2_instance, args.get_endpoint, authoring_pa_id)
             logging.info("Publishing...")
             publish_item(
                 oauth2_instance,
                 args.publish_endpoint,
                 args.publish_action,
-                course_id,
-                item_id,
-                metadata)
+                authoring_pa_id,
+                write_access_token)
             logging.info("Publish complete for item {} in course {}".format(
                 item_id, course_id))
         except ItemNotFoundError as e:
             logging.error(
                 "Unable to find a publishable assignment with item "
                 "id {}. Maybe there are no changes to publish?".format(
-                    item_id, course_id))
+                    id))
             error = ErrorCodes.FATAL_ERROR
         except ValidationError as e:
             logging.error(
@@ -129,37 +133,61 @@ def command_publish(args):
                 "us know.".format(
                     item_id))
             error = ErrorCodes.FATAL_ERROR
+        except ProgrammingAssignmentDraftNotReadyError as e:
+            logging.error(
+                "Your assignment with item id {} is not ready for publish. "
+                "Please verify your assignment draft is ready and try "
+                "again.".format(item_id))
+            error = ErrorCodes.FATAL_ERROR
     if error is not None:
         sys.exit(error)
 
 
-def get_metadata(oauth2_instance, get_endpoint, course_id, item_id):
+def get_write_access_token(oauth2_instance, get_endpoint, authoring_pa_id):
     auth = oauth2_instance.build_authorizer()
     resp = requests.get(
-        '{}/{}~{}'.format(get_endpoint, course_id, item_id),
+        '{}/{}?fields=writeAccessToken'.format(
+            get_endpoint, authoring_pa_id),
         auth=auth)
     if resp.status_code == 404:
-        raise ItemNotFoundError(course_id, item_id)
+        raise ItemNotFoundError(authoring_pa_id)
     elif resp.status_code == 500:
         raise InternalError()
-    return resp.json()['elements'][0]['metadata']
+    pa_authoring = resp.json()['elements'][0]
+    if not pa_authoring['readyForPublish']:
+        raise ProgrammingAssignmentDraftNotReadyError()
+    return pa_authoring['writeAccessToken']
+
+
+def get_authoring_pa_id(oauth2_instance, course_id, item_id):
+    auth = oauth2_instance.build_authorizer()
+    atom_relation_api = 'https://api.coursera.org/api/'
+    'authoringItemContentRelations.v1'
+    resp = requests.get(
+        '{}/{}~{}?fields=atomId'.format(
+            atom_relation_api, course_id, item_id),
+        auth=auth)
+    if resp.status_code == 404:
+        return '{}~{}'.format(course_id, item_id)
+    elif resp.status_code == 500:
+        raise InternalError()
+    return resp.json()['elements'][0]['atomId']
 
 
 def publish_item(
         oauth2_instance,
         publish_endpoint,
         publish_action,
-        course_id,
-        item_id,
-        metadata):
+        authoring_pa_id,
+        write_access_token):
 
     auth = oauth2_instance.build_authorizer()
     params = {
         "action": publish_action,
-        "id": "{}~{}".format(course_id, item_id)
+        "id": authoring_pa_id
     }
     resp = requests.post(
-        publish_endpoint, params=params, json=metadata, auth=auth)
+        publish_endpoint, params=params, json=write_access_token, auth=auth)
     if resp.status_code == 400:
         status = get_executor_status(resp.json())
         if status is None:
@@ -205,13 +233,13 @@ def parser(subparsers):
     parser_publish.add_argument(
         '--get-endpoint',
         default='https://api.coursera.org/api/'
-                'authoringProgrammingAssignments.v1',
+                'authoringProgrammingAssignments.v2',
         help='Override the endpoint used to get the assignment (draft)')
 
     parser_publish.add_argument(
         '--publish-endpoint',
         default='https://api.coursera.org/api/'
-                'authoringProgrammingAssignments.v1',
+                'authoringProgrammingAssignments.v2',
         help='Override the endpoint used to publish the assignment (draft)')
 
     parser_publish.add_argument(
