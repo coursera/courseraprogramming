@@ -27,8 +27,10 @@ class PublishParams:
     get_endpoint = "fake-endpoint"
     publish_endpoint = "fake-endpoint"
     publish_action = "fake-action"
-    course = "2345"
-    item = "3456"
+    course = "course2345"
+    item = "item3456"
+    write_access_token = "token4567"
+    authoring_pa_id = "{}~{}".format(course, item)
     quiet = 1
     additional_items = None
     config = None
@@ -36,17 +38,25 @@ class PublishParams:
     verbose = None
 
 
-def fake_get_metadata(oauth, get_endpoint, course_id, item_id):
-    return {
-        "version": 0,
-        "authorId": 1234,
-        "publishedAssignmentId": 4321,
-        "updatedAt": 10000000,
-    }
+def fake_get_write_access_token(oauth, get_endpoint, authoring_pa_id):
+    return "token4567"
 
 
-def test_called_with_metadata():
-    publish.get_metadata = fake_get_metadata
+def fake_get_authoring_pa_id(oauth, course_id, item_id):
+    return "{}~{}".format(course_id, item_id)
+
+
+# def fake_get_authoring_pa_id_item(oauth, course_id, item_id):
+#     return authoring_pa_id_item
+
+
+# def fake_get_authoring_pa_id_atom(oauth, course_id, item_id):
+#     return authoring_pa_id_atom
+
+
+def test_called_with_write_access_token():
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = MagicMock()
 
     publish.command_publish(PublishParams)
@@ -55,22 +65,17 @@ def test_called_with_metadata():
         ANY,
         "fake-endpoint",
         "fake-action",
-        "2345",
-        "3456",
-        {
-            "version": 0,
-            "authorId": 1234,
-            "publishedAssignmentId": 4321,
-            "updatedAt": 10000000,
-        }
+        "course2345~item3456",
+        "token4567"
     )
 
 
 def test_multiple_items():
-    publish.get_metadata = fake_get_metadata
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = MagicMock()
 
-    PublishParams.additional_items = ['4567', '5678']
+    PublishParams.additional_items = ['item4567', 'item5678']
     publish.command_publish(PublishParams)
     PublishParams.additional_items = None
 
@@ -79,51 +84,34 @@ def test_multiple_items():
             ANY,
             "fake-endpoint",
             "fake-action",
-            "2345",
-            "3456",
-            {
-                "version": 0,
-                "authorId": 1234,
-                "publishedAssignmentId": 4321,
-                "updatedAt": 10000000,
-            }
+            "course2345~item3456",
+            "token4567"
         ),
         call(
             ANY,
             "fake-endpoint",
             "fake-action",
-            "2345",
-            "4567",
-            {
-                "version": 0,
-                "authorId": 1234,
-                "publishedAssignmentId": 4321,
-                "updatedAt": 10000000,
-            }
+            "course2345~item4567",
+            "token4567"
         ),
         call(
             ANY,
             "fake-endpoint",
             "fake-action",
-            "2345",
-            "5678",
-            {
-                "version": 0,
-                "authorId": 1234,
-                "publishedAssignmentId": 4321,
-                "updatedAt": 10000000,
-            }
+            "course2345~item5678",
+            "token4567"
         )
     ])
 
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_item_not_found_metadata(sys):
-    def fake_get_metadata_throw(oauth, get_endpoint, course_id, item_id):
+    def fake_get_token_throw(oauth, get_endpoint, authoring_pa_id):
         raise publish.ItemNotFoundError(
-            PublishParams.course, PublishParams.item)
+            PublishParams.authoring_pa_id)
 
-    publish.get_metadata = fake_get_metadata_throw
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_token_throw
 
     publish.command_publish(PublishParams)
 
@@ -132,10 +120,11 @@ def test_item_not_found_metadata(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_internal_error_metadata(sys):
-    def fake_get_metadata_throw(oauth, get_endpoint, course_id, item_id):
+    def fake_get_token_throw(oauth, get_endpoint, authoring_pa_id):
         raise publish.InternalError()
 
-    publish.get_metadata = fake_get_metadata_throw
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_token_throw
 
     publish.command_publish(PublishParams)
 
@@ -144,10 +133,11 @@ def test_internal_error_metadata(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_failed_validation(sys):
-    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, authoring_pa_id, token):
         raise publish.ValidationError()
 
-    publish.get_metadata = fake_get_metadata
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
@@ -157,11 +147,12 @@ def test_failed_validation(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_pending_executor(sys):
-    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, authoring_pa_id, token):
         raise publish.GraderExecutorError(
             status=publish.GraderExecutorStatus.PENDING)
 
-    publish.get_metadata = fake_get_metadata
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
@@ -171,11 +162,12 @@ def test_pending_executor(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_failed_executor(sys):
-    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, authoring_pa_id, token):
         raise publish.GraderExecutorError(
             status=publish.GraderExecutorStatus.FAILED)
 
-    publish.get_metadata = fake_get_metadata
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
@@ -184,11 +176,12 @@ def test_failed_executor(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_missing_executor(sys):
-    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, authoring_pa_id, token):
         raise publish.GraderExecutorError(
             status=publish.GraderExecutorStatus.MISSING)
 
-    publish.get_metadata = fake_get_metadata
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
@@ -197,10 +190,11 @@ def test_missing_executor(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_internal_error_publish(sys):
-    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, authoring_pa_id, token):
         raise publish.InternalError()
 
-    publish.get_metadata = fake_get_metadata
+    publish.get_authoring_pa_id = fake_get_authoring_pa_id
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
@@ -210,11 +204,25 @@ def test_internal_error_publish(sys):
 
 @patch('courseraprogramming.commands.publish.sys')
 def test_item_not_found_publish(sys):
-    def fake_publish_item(oauth, endpoint, action, course, item, metadata):
+    def fake_publish_item(oauth, endpoint, action, authoring_pa_id, token):
         raise publish.ItemNotFoundError(
-            PublishParams.course, PublishParams.item)
+            PublishParams.authoring_pa_id)
 
-    publish.get_metadata = fake_get_metadata
+    publish.get_write_access_token = fake_get_write_access_token
+    publish.publish_item = fake_publish_item
+
+    publish.command_publish(PublishParams)
+
+    sys.exit.assert_called_with(publish.ErrorCodes.FATAL_ERROR)
+
+
+@patch('courseraprogramming.commands.publish.sys')
+def test_assignment_not_ready_publish(sys):
+    def fake_publish_item(oauth, endpoint, action, authoring_pa_id, token):
+        raise publish.ProgrammingAssignmentDraftNotReadyError(
+            PublishParams.authoring_pa_id)
+
+    publish.get_write_access_token = fake_get_write_access_token
     publish.publish_item = fake_publish_item
 
     publish.command_publish(PublishParams)
