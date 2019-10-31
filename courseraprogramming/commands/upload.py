@@ -228,7 +228,7 @@ def command_upload(args):
     p.join(1)  # Join to clean up zombie.
 
     # TODO: make time waiting for transloadit to finish processing configurable
-    for i in xrange(300):
+    for i in range(300):
         upload_information = poll_transloadit(args, upload_url)
         if upload_information is not None:
             break

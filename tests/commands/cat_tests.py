@@ -35,8 +35,8 @@ def test_ls_run(utils):
 
     docker_mock = MagicMock(spec=docker.Client)
     docker_mock.create_container.return_value = {
-        u'Id': u'really-long-container-id-hash',
-        u'Warnings': None
+        'Id': 'really-long-container-id-hash',
+        'Warnings': None
     }
     docker_mock.wait.return_value = 0
     docker_mock.logs.return_value = "1231\n1241\n41211"

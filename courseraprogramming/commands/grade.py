@@ -123,7 +123,7 @@ def compute_memory_limit(args):
     exception if it is of an unexpected value.
     """
     if args.mem_limit % 1024 == 0:
-        return "%sg" % (args.mem_limit / 1024)
+        return "%sg" % (args.mem_limit // 1024)
     else:
         raise MemoryFormatError()
 

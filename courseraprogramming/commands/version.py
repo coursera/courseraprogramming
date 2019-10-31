@@ -44,12 +44,12 @@ def command_version(args):
         __version__ = _dist.version
 
     if args.quiet and args.quiet > 0:
-        print __version__
+        print(__version__)
     else:
-        print "Your %(prog)s's version is:\n\t%(version)s" % {
+        print("Your %(prog)s's version is:\n\t%(version)s" % {
             "prog": sys.argv[0],
             "version": __version__
-        }
+        })
 
 
 def parser(subparsers):
