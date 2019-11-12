@@ -55,12 +55,11 @@ def command_ls(args):
         logging.warn("The ls command did not exit cleanly within the "
                      "container. Exit code: %s", exit_code)
 
-    command_output = d.logs(container)
+    command_output = d.logs(container).decode("utf-8")
     # Use sys.stdout to avoid extra trailing newline. (Py3.x compatible)
     sys.stdout.write(command_output)
     if not args.no_rm:
         d.remove_container(container)
-
 
 def parser(subparsers):
     "Build an argparse argument parser to parse the command line."

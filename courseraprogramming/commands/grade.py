@@ -57,7 +57,7 @@ def run_container(docker, container, args):
                      "container. Exit code: %s", exit_code)
 
     if logging.getLogger().isEnabledFor(logging.INFO):
-        stderr_output = docker.logs(container, stdout=False, stderr=True)
+        stderr_output = docker.logs(container, stdout=False, stderr=True).decode("utf-8")
         logging.info('Debug log:')
         sys.stdout.write('-' * 80)
         sys.stdout.write('\n')
@@ -65,7 +65,7 @@ def run_container(docker, container, args):
         sys.stdout.write('-' * 80)
         sys.stdout.write('\n')
 
-    stdout_output = docker.logs(container, stdout=True, stderr=False)
+    stdout_output = docker.logs(container, stdout=True, stderr=False).decode("utf-8")
     error_in_grader_output = False
     try:
         parsed_output = json.loads(stdout_output)
