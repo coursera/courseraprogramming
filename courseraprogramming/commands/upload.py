@@ -61,7 +61,8 @@ def get_container_image(args, d):
     image_file_path = os.path.join(args.temp_dir, image_file_name)
     logging.debug('Image file path: %s', image_file_path)
 
-    if not args.quiet or args.quiet == 0: # print when args.quiet is None or args.quiet is 0
+    # print when args.quiet is None or args.quiet is 0
+    if not args.quiet or args.quiet == 0:
         sys.stdout.write(
             'Saving image %s to %s...' % (args.imageId, image_file_path))
         sys.stdout.flush()

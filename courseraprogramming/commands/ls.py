@@ -63,6 +63,7 @@ def command_ls(args):
     if not args.no_rm:
         d.remove_container(container)
 
+
 def parser(subparsers):
     "Build an argparse argument parser to parse the command line."
 
