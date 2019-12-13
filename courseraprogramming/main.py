@@ -51,7 +51,7 @@ def build_parser():
     # from there.
     subparsers = parser.add_subparsers(dest="-h")
     subparsers.required = True
-    
+
     # create the parser for the cat command
     commands.cat.parser(subparsers)
 
