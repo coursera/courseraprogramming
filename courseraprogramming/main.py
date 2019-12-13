@@ -49,11 +49,9 @@ def build_parser():
     # subparsers. Each subcommand should set a default value for the 'func'
     # option. We then call the parsed 'func' function, and execution carries on
     # from there.
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest="-h")
+    subparsers.required = True
     
-    subparsers = parser.add_subparsers(dest='parser')  # dest needed for error message
-    subparsers.required = True   # force 'required' testing
-
     # create the parser for the cat command
     commands.cat.parser(subparsers)
 
