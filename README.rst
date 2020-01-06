@@ -14,12 +14,12 @@ endeavour. See below for brief descriptions of this tool's capabilities.
 Installation
 ------------
 
-Currently, pip install only downloads an older version of courseraprogramming, use the following commands to install from source:
+Currently, pip install only downloads an older version of courseraprogramming, use the following commands to install from source::
 
-- git clone https://github.com/coursera/courseraprogramming.git
-- cd courseraprogramming
-- python3 setup.py develop
-- pip install -r test_requirements.txt
+  git clone https://github.com/coursera/courseraprogramming.git
+  cd courseraprogramming
+  python3 setup.py develop
+  pip install -r test_requirements.txt
 
 You would need to install git, pip, and python3 to install and run correctly.
 
