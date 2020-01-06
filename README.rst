@@ -14,9 +14,17 @@ endeavour. See below for brief descriptions of this tool's capabilities.
 Installation
 ------------
 
-To install this sdk, simply execute::
+Currently, pip install only downloads an older version of courseraprogramming, use the following commands to install from source:
 
-    sudo pip install courseraprogramming
+git clone
+
+cd courseraprogramming
+
+python3 setup.py develop
+
+pip install -r test_requirements.txt
+
+You would need to install `git`, `pip`, and `python3` to install and run correctly. 
 
 `pip <https://pip.pypa.io/en/latest/index.html>`_ is a python package manager.
 If you do not have ``pip`` installed on your machine, please follow the
