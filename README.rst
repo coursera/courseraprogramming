@@ -16,15 +16,16 @@ Installation
 
 Currently, pip install only downloads an older version of courseraprogramming, use the following commands to install from source:
 
-git clone
+- git clone https://github.com/coursera/courseraprogramming.git
+- cd courseraprogramming
+- python3 setup.py develop
+- pip install -r test_requirements.txt
 
-cd courseraprogramming
+You would need to install git, pip, and python3 to install and run correctly.
 
-python3 setup.py develop
+If you have used the `pip install` workflow previously to install `courseraprogramming`, we recommend using this flow to update your `courseraprogramming` version.
 
-pip install -r test_requirements.txt
-
-You would need to install `git`, `pip`, and `python3` to install and run correctly. 
+If you would like to separate your build environments, we recommend installing `courseraprogramming` within a virtual environment.
 
 `pip <https://pip.pypa.io/en/latest/index.html>`_ is a python package manager.
 If you do not have ``pip`` installed on your machine, please follow the
