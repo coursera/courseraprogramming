@@ -47,6 +47,8 @@ def command_cat(args):
                      "container. Exit code: %s", exit_code)
 
     command_output = d.logs(container)
+    if type(command_output) is bytes:
+        command_output = command_output.decode("utf-8")
     # Use sys.stdout to avoid extra trailing newline. (Py3.x compatible)
     sys.stdout.write(command_output)
 

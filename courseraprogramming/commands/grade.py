@@ -58,6 +58,8 @@ def run_container(docker, container, args):
 
     if logging.getLogger().isEnabledFor(logging.INFO):
         stderr_output = docker.logs(container, stdout=False, stderr=True)
+        if type(stderr_output) is bytes:
+            stderr_output = stderr_output.decode("utf-8")
         logging.info('Debug log:')
         sys.stdout.write('-' * 80)
         sys.stdout.write('\n')
@@ -66,6 +68,8 @@ def run_container(docker, container, args):
         sys.stdout.write('\n')
 
     stdout_output = docker.logs(container, stdout=True, stderr=False)
+    if type(stdout_output) is bytes:
+        stdout_output = stdout_output.decode("utf-8")
     error_in_grader_output = False
     try:
         parsed_output = json.loads(stdout_output)
@@ -123,7 +127,7 @@ def compute_memory_limit(args):
     exception if it is of an unexpected value.
     """
     if args.mem_limit % 1024 == 0:
-        return "%sg" % (args.mem_limit / 1024)
+        return "%sg" % (args.mem_limit // 1024)
     else:
         raise MemoryFormatError()
 

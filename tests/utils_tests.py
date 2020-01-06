@@ -21,7 +21,7 @@ import logging
 # Set up mocking of the `open` call. See http://www.ichimonji10.name/blog/6/
 from sys import version_info
 if version_info.major == 2:
-    import __builtin__ as builtins  # pylint:disable=import-error
+    import builtins as builtins  # pylint:disable=import-error
 else:
     import builtins  # pylint:disable=import-error
 

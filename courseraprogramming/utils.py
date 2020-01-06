@@ -79,6 +79,7 @@ def set_logging_level(args):
         else:
             logging.critical("quiet is an unexpected value. (%s) exiting.",
                              args.quiet)
+
     if level is not None:
         root_logger.setLevel(level)
 

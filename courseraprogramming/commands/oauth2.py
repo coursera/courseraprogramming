@@ -18,9 +18,9 @@
 Helpers for working with OAuth2 / etc.
 '''
 
-import BaseHTTPServer
-import ConfigParser
-import cPickle
+import http.server
+import configparser
+import pickle
 import logging
 import requests
 import io
@@ -29,7 +29,7 @@ import os.path
 import subprocess
 import sys
 import time
-import urlparse
+import urllib.parse
 import uuid
 from sys import platform as _platform
 
@@ -99,7 +99,7 @@ def _make_handler(state_token, done_function):
     done_function is a function that is called, with the code passed to it.
     '''
 
-    class LocalServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    class LocalServerHandler(http.server.BaseHTTPRequestHandler):
 
         def error_response(self, msg):
             logging.warn(
@@ -112,13 +112,13 @@ def _make_handler(state_token, done_function):
             self.wfile.write(msg)
 
         def do_GET(self):
-            parsed = urlparse.urlparse(self.path)
+            parsed = urllib.parse.urlparse(self.path)
             if len(parsed.query) == 0 or parsed.path != '/callback':
                 self.error_response(
                     'We encountered a problem with your request.')
                 return
 
-            params = urlparse.parse_qs(parsed.query)
+            params = urllib.parse.parse_qs(parsed.query)
             if params['state'] != [state_token]:
                 self.error_response(
                     'Attack detected: state tokens did not match!')
@@ -132,9 +132,9 @@ def _make_handler(state_token, done_function):
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(
-                "courseraprogramming: we have captured Coursera's response "
-                "code. Feel free to close this browser window now and return "
-                "to your terminal. Thanks!")
+                ("courseraprogramming: we have captured Coursera's response "
+                 "code. Feel free to close this browser window now and return "
+                 "to your terminal. Thanks!").encode("utf-8"))
             done_function(params['code'][0])
 
     return LocalServerHandler
@@ -183,7 +183,7 @@ class CourseraOAuth2(object):
         if not os.path.isfile(self.token_cache_file):
             dir_name = os.path.dirname(self.token_cache_file)
             try:
-                os.makedirs(dir_name, mode=0700)
+                os.makedirs(dir_name, mode=0o700)
             except:
                 logging.debug(
                     'Encountered an exception creating directory for token '
@@ -222,7 +222,7 @@ class CourseraOAuth2(object):
             logging.debug('About to read from local file cache file %s',
                           self.token_cache_file)
             with open(self.token_cache_file, 'rb') as f:
-                fs_cached = cPickle.load(f)
+                fs_cached = pickle.load(f)
                 if self._check_token_cache_type(fs_cached):
                     logging.debug('Loaded from file system: %s', fs_cached)
                     return fs_cached
@@ -251,7 +251,7 @@ class CourseraOAuth2(object):
             logging.debug('About to write to fs cache file: %s',
                           self.token_cache_file)
             with open(self.token_cache_file, 'wb') as f:
-                cPickle.dump(new_cache, f, protocol=cPickle.HIGHEST_PROTOCOL)
+                pickle.dump(new_cache, f, protocol=pickle.HIGHEST_PROTOCOL)
                 logging.debug('Finished dumping cache_value to fs cache file.')
         except:
             logging.exception(
@@ -268,10 +268,7 @@ class CourseraOAuth2(object):
         Returns true is correct type, False otherwise.
         '''
         def check_string_value(name):
-            return (
-                isinstance(cache_value[name], str) or
-                isinstance(cache_value[name], unicode)
-            )
+            return isinstance(cache_value[name], str)
 
         def check_refresh_token():
             if 'refresh' in cache_value:
@@ -334,7 +331,7 @@ class CourseraOAuth2(object):
 
         if 'refresh_token' in body:
             refresh = body['refresh_token']
-            if isinstance(refresh, str) or isinstance(refresh, unicode):
+            if isinstance(refresh, str):
                 tokens['refresh'] = refresh
         return tokens
 
@@ -384,7 +381,7 @@ class CourseraOAuth2(object):
             server_address = ('', self.local_webserver_port)
             code_holder = CodeHolder()
 
-            local_server = BaseHTTPServer.HTTPServer(
+            local_server = http.server.HTTPServer(
                 server_address,
                 _make_handler(state_token, code_holder))
 
@@ -392,7 +389,7 @@ class CourseraOAuth2(object):
                 local_server.handle_request()
             coursera_code = code_holder.code
         else:
-            coursera_code = raw_input('Please enter the code from Coursera: ')
+            coursera_code = input('Please enter the code from Coursera: ')
 
         form_data = {
             'code': coursera_code,
@@ -497,8 +494,8 @@ token_cache = ~/.coursera/oauth2_cache.pickle
 [upload]
 transloadit_bored_api = https://api2.transloadit.com/instances/bored
 '''
-    cfg = ConfigParser.SafeConfigParser()
-    cfg.readfp(io.BytesIO(defaults))
+    cfg = configparser.SafeConfigParser()
+    cfg.read_file(io.StringIO(defaults))
     cfg.read([
         '/etc/coursera/courseraprogramming.cfg',
         os.path.expanduser('~/.coursera/courseraprogramming.cfg'),

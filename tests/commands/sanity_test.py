@@ -23,7 +23,7 @@ from testfixtures import LogCapture
 # Set up mocking of the `open` call. See http://www.ichimonji10.name/blog/6/
 from sys import version_info
 if version_info.major == 2:
-    import __builtin__ as builtins  # pylint:disable=import-error
+    import builtins as builtins  # pylint:disable=import-error
 else:
     import builtins  # pylint:disable=import-error
 
@@ -90,7 +90,7 @@ def test_command_sanity():
 
 
 def command_sanity_impl(dockerFile, expectedLogs):
-    print "TESTING %s WITH %s" % (dockerFile, expectedLogs)
+    print("TESTING %s WITH %s" % (dockerFile, expectedLogs))
     with LogCapture() as logs:
         open_ = mock_open(read_data='\n'.join(dockerFile))
         open_().readlines.return_value = dockerFile

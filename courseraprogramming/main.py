@@ -49,7 +49,8 @@ def build_parser():
     # subparsers. Each subcommand should set a default value for the 'func'
     # option. We then call the parsed 'func' function, and execution carries on
     # from there.
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest="-h")
+    subparsers.required = True
 
     # create the parser for the cat command
     commands.cat.parser(subparsers)
@@ -95,6 +96,7 @@ def main():
     # Configure logging
     args.setup_logging(args)
     # Dispatch into the appropriate subcommand function.
+
     try:
         return args.func(args)
     except SystemExit:

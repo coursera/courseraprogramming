@@ -59,9 +59,9 @@ def check_auth(args):
             r.text)
         name = None
 
-    if not args.quiet > 0:
-        print 'Name: %s' % name
-        print 'External ID: %s' % external_id
+    if not args.quiet or args.quiet == 0:
+        print('Name: %s' % name)
+        print('External ID: %s' % external_id)
 
     if name is None or external_id is None:
         sys.exit(1)
@@ -74,23 +74,23 @@ def display_auth_cache(args):
     You must keep the tokens secure. Treat them as passwords.
     '''
     oauth2_instance = oauth2.build_oauth2(args)
-    if not args.quiet > 0:
+    if not args.quiet or args.quiet == 0:
         token = oauth2_instance.token_cache['token']
         if not args.no_truncate and token is not None:
             token = token[:10] + '...'
-        print "Auth token: %s" % token
+        print("Auth token: %s" % token)
 
         expires_time = oauth2_instance.token_cache['expires']
         expires_in = int((expires_time - time.time()) * 10) / 10.0
-        print "Auth token expires in: %s seconds." % expires_in
+        print("Auth token expires in: %s seconds." % expires_in)
 
         if 'refresh' in oauth2_instance.token_cache:
             refresh = oauth2_instance.token_cache['refresh']
             if not args.no_truncate and refresh is not None:
                 refresh = refresh[:10] + '...'
-            print "Refresh token: %s" % refresh
+            print("Refresh token: %s" % refresh)
         else:
-            print "No refresh token found."
+            print("No refresh token found.")
 
 
 def parser(subparsers):

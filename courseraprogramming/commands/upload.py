@@ -60,13 +60,15 @@ def get_container_image(args, d):
     logging.debug('Image file name: %s', image_file_name)
     image_file_path = os.path.join(args.temp_dir, image_file_name)
     logging.debug('Image file path: %s', image_file_path)
-    if not args.quiet > 0:
+
+    # print when args.quiet is None or args.quiet is 0
+    if not args.quiet or args.quiet == 0:
         sys.stdout.write(
             'Saving image %s to %s...' % (args.imageId, image_file_path))
         sys.stdout.flush()
-    with open(image_file_path, 'w') as image_tar:
+    with open(image_file_path, 'wb') as image_tar:
         image_tar.write(image.data)
-    if not args.quiet > 0:
+    if not args.quiet or args.quiet == 0:
         sys.stdout.write(' done.\n')
         sys.stdout.flush()
     return (image_file_path, image_file_name)
@@ -142,20 +144,20 @@ def poll_transloadit(args, upload_url):
         stage = body['ok']
         if stage == 'ASSEMBLY_UPLOADING':
             progress = float(body['bytes_received']) / body['bytes_expected']
-            if not args.quiet > 0:
+            if not args.quiet or args.quiet == 0:
                 sys.stdout.write("\rUploading... %(progress)s%% complete." % {
                     'progress': int(progress * 100),
                 })
                 sys.stdout.flush()
             return None
         elif stage == 'ASSEMBLY_EXECUTING':
-            if not args.quiet > 0:
+            if not args.quiet or args.quiet == 0:
                 sys.stdout.write(
                     "\rTransloadIt is processing... (typically < 2 min)")
                 sys.stdout.flush()
             return None
         elif stage == 'ASSEMBLY_COMPLETED':
-            if not args.quiet > 1:
+            if not args.quiet or args.quiet == 1:
                 sys.stdout.write("\rAssembly upload complete.\n")
                 sys.stdout.flush()
             try:
@@ -199,7 +201,7 @@ def command_upload(args):
     if args.upload_to_requestbin is not None:
         upload_url = 'http://requestb.in/%s' % args.upload_to_requestbin
 
-    if not args.quiet > 0:
+    if not args.quiet or args.quiet == 0:
         sys.stdout.write(
             'About to upload to server:\n\t%(transloadit_host)s\n'
             'with upload id:\n\t%(upload_id)s\nStatus API:\n'
@@ -228,7 +230,7 @@ def command_upload(args):
     p.join(1)  # Join to clean up zombie.
 
     # TODO: make time waiting for transloadit to finish processing configurable
-    for i in xrange(300):
+    for i in range(300):
         upload_information = poll_transloadit(args, upload_url)
         if upload_information is not None:
             break

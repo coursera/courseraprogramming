@@ -14,7 +14,7 @@ setup(name='courseraprogramming',
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'License :: OSI Approved :: Apache Software License',
-          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.7',
       ],
       keywords='grading programming coursera sdk docker cli tool',
       url='https://github.com/coursera/courseraprogramming',
