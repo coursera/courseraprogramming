@@ -4,6 +4,14 @@ courseraprogramming
 .. image:: https://travis-ci.org/coursera/courseraprogramming.svg
     :target: https://travis-ci.org/coursera/courseraprogramming
 
+Heads Up!
+------------
+We are upgrading the infrastructure system for Coursera Programming Assignment auto-graders. Starting November 18, 2020, all newly uploaded custom graders will use Autograder 2.0 infrastructure. Thus, we encourage you to start use the new SDK, `coursera_autograder <https://github.com/coursera/coursera_autograder>`_. Courseraprogramming will be sunsetted on January 13, 2021. 
+
+For more information about the Autograder 2.0 infrastructure, please review this `document <https://docs.google.com/document/d/1pC6nvQbgVGoQ1LUoKKfxc-Hi4NkhhlnKKG_Wnydu5p8>`_.
+
+About courseraprogramming
+------------
 This command-line tool is a software development toolkit to help instructional
 teams author asynchronous graders for Coursera (typically programming
 assignments). Coursera's asynchronous grading environment is based upon
