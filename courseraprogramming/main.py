@@ -89,6 +89,14 @@ def build_parser():
     return parser
 
 
+def printAutograderV2HeadsUp():
+    print("""
+	Heads Up (Autograder 2.0 infrastructure)!
+	========================================
+	We upgraded the infrastructure system for Coursera Programming Assignment auto-graders. All newly uploaded custom graders using web UI will use Autograder 2.0 infrastructure. Thus, we encourage you to start use the new SDK, `coursera_autograder <https://github.com/coursera/coursera_autograder>`_. Courseraprogramming will be sunsetted on January 13, 2021. For more information about the Autograder 2.0 infrastructure, please review this document: https://docs.google.com/document/d/1pC6nvQbgVGoQ1LUoKKfxc-Hi4NkhhlnKKG_Wnydu5p8 .
+	========================================
+	""")
+
 def main():
     "Boots up the command line tool"
     logging.captureWarnings(True)
@@ -96,6 +104,8 @@ def main():
     # Configure logging
     args.setup_logging(args)
     # Dispatch into the appropriate subcommand function.
+    
+    printAutograderV2HeadsUp()
 
     try:
         return args.func(args)

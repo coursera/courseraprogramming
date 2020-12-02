@@ -161,7 +161,7 @@ timeout are all customizable.
    the grader will have access to when grading. The default is 1.
  - ``--grader-memory-limit`` takes a value of 1024, 2048, 3072 or 4096, representing the
    amount of memory in MB the grader will have access to when grading. The
-   default is 1024.
+   default is 4096.
  - ``--grading-timeout`` takes a value between 300 and 1800, representing the
    amount of time the grader is allowed to run before it times out. Note this
    value is counted from the moment the grader starts execution and does not
